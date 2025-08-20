@@ -1,7 +1,16 @@
 import { Injectable, InternalServerErrorException } from "@nestjs/common";
 import { LoginDto } from "./dto/login.dto";
-import User from "@/model/user.model";
+import User, { UserCreationProps } from "@/model/user.model";
 import { InjectModel } from "@nestjs/sequelize";
+import { hashedPassword } from "@/lib";
+import {
+  defaultAdminContactNumber,
+  defaultAdminEmail,
+  defaultAdminName,
+  defaultAdminPassword,
+  defaultAdminUsername,
+} from "@/config/dotenv.config";
+import { RegisterDto } from "./dto/register.dto";
 
 @Injectable()
 export class AuthService {
@@ -23,14 +32,14 @@ export class AuthService {
 
   async insertInitialAdmin() {
     const initialAdmin = {
-      name: "Admin",
-      contactNumber: "1234567890",
+      name: defaultAdminName,
+      contactNumber: defaultAdminContactNumber,
       userGroup: "admin",
       userLevel: "admin",
       permission: "admin",
-      username: "admin",
-      email: "admin@example.com",
-      password: "123456",
+      username: defaultAdminUsername,
+      email: defaultAdminEmail,
+      password: await hashedPassword(defaultAdminPassword),
       status: "active",
       isDeleted: false,
     };
@@ -43,17 +52,34 @@ export class AuthService {
     }
   }
 
-  async login(loginDto: LoginDto): Promise<User | null> {
+  async findUserByEmail(
+    loginDto: LoginDto,
+  ): Promise<User | UserCreationProps | null> {
     try {
       const user = await this.userModel.findOne({
         where: {
           email: loginDto?.email,
-          password: loginDto?.password,
         },
       });
 
       if (user) {
-        return user;
+        return user.toJSON();
+      }
+      return null;
+    } catch (err: any) {
+      console.log(err);
+      throw new InternalServerErrorException(err.message);
+    }
+  }
+
+  async createUser(
+    registerDto: RegisterDto,
+  ): Promise<User | UserCreationProps | null> {
+    try {
+      const createdUser = await this.userModel.create(registerDto);
+
+      if (createdUser) {
+        return createdUser.toJSON();
       }
       return null;
     } catch (err: any) {
