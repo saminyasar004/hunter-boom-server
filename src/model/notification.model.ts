@@ -58,7 +58,6 @@ export default class Notification extends Model<
   @Column({
     type: DataType.INTEGER,
     allowNull: false,
-    defaultValue: 0,
   })
   declare agentId: number;
 }

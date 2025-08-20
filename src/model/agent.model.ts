@@ -55,6 +55,7 @@ export interface AgentCreationProps {
   addressState: string;
   icSsm: string;
   username: string;
+  name: string;
   password: string;
   agentGroupId: number;
   blacklisted: boolean;
@@ -85,7 +86,7 @@ export default class Agent extends Model<AgentProps, AgentCreationProps> {
   @Column({
     type: DataType.BOOLEAN,
     allowNull: false,
-    defaultValue: 0,
+    defaultValue: false,
   })
   declare isTopLevel: boolean;
 
@@ -177,6 +178,12 @@ export default class Agent extends Model<AgentProps, AgentCreationProps> {
     type: DataType.STRING,
     allowNull: false,
   })
+  declare name: string;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+  })
   declare password: string;
 
   @Column({
@@ -188,14 +195,14 @@ export default class Agent extends Model<AgentProps, AgentCreationProps> {
   @Column({
     type: DataType.BOOLEAN,
     allowNull: false,
-    defaultValue: 0,
+    defaultValue: false,
   })
   declare blacklisted: boolean;
 
   @Column({
     type: DataType.BOOLEAN,
     allowNull: false,
-    defaultValue: 0,
+    defaultValue: false,
   })
   declare isDeleted: boolean;
 

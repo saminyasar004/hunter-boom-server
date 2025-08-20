@@ -76,7 +76,7 @@ export default class ActionLogUser extends Model<
   @Column({
     type: DataType.BOOLEAN,
     allowNull: false,
-    defaultValue: 0,
+    defaultValue: false,
   })
   declare isSuccess: boolean;
 

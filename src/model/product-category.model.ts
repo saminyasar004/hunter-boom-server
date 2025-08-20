@@ -49,7 +49,7 @@ export default class ProductCategory extends Model<
   @Column({
     type: DataType.BOOLEAN,
     allowNull: false,
-    defaultValue: 0,
+    defaultValue: false,
   })
   declare isDeleted: boolean;
 }

@@ -10,7 +10,6 @@ import { status } from "../interfaces/";
 
 export interface AgentGroupProps {
   agentGroupId: number;
-  code?: string;
   name?: string;
   status: status;
   isDeleted: boolean;
@@ -43,12 +42,6 @@ export default class AgentGroup extends Model<
   declare name: string;
 
   @Column({
-    type: DataType.STRING,
-    allowNull: true,
-  })
-  declare code: string;
-
-  @Column({
     type: DataType.ENUM("active", "inactive"),
     allowNull: false,
   })
@@ -57,7 +50,7 @@ export default class AgentGroup extends Model<
   @Column({
     type: DataType.BOOLEAN,
     allowNull: false,
-    defaultValue: 0,
+    defaultValue: false,
   })
   declare isDeleted: boolean;
 }

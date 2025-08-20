@@ -111,7 +111,7 @@ export default class Product extends Model<ProductProps, ProductCreationProps> {
   @Column({
     type: DataType.BOOLEAN,
     allowNull: false,
-    defaultValue: 0,
+    defaultValue: false,
   })
   declare isDeleted: number;
 }

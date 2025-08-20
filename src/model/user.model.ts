@@ -74,13 +74,19 @@ export default class User extends Model<UserProps, UserCreationProps> {
     type: DataType.STRING,
     allowNull: false,
   })
-  declare number: string;
+  declare contactNumber: string;
 
   @Column({
     type: DataType.STRING,
     allowNull: false,
   })
-  declare group: string;
+  declare userGroup: string;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+  })
+  declare userLevel: string;
 
   @Column({
     type: DataType.STRING,
@@ -93,4 +99,11 @@ export default class User extends Model<UserProps, UserCreationProps> {
     allowNull: false,
   })
   declare status: string;
+
+  @Column({
+    type: DataType.BOOLEAN,
+    allowNull: false,
+    defaultValue: false,
+  })
+  declare isDeleted: boolean;
 }

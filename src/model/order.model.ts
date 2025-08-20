@@ -249,7 +249,7 @@ export default class Order extends Model<OrderProps, OrderCreationProps> {
   @Column({
     type: DataType.BOOLEAN,
     allowNull: false,
-    defaultValue: 0,
+    defaultValue: false,
   })
   declare isDeleted: number;
 
