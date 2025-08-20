@@ -20,41 +20,27 @@ export class AuthController {
   @Post("login")
   async login(@Body() loginDto: LoginDto) {
     try {
-      await this.authService.login(loginDto);
+      const user = await this.authService.login(loginDto);
+
+      if (user) {
+        const { password, ...responseData } = user;
+        return {
+          status: 200,
+          message: "Login successful",
+          data: responseData,
+        };
+      }
+
       return {
-        status: 201,
-        message: "Login successful",
+        status: 401,
+        message: "Invalid credentials",
       };
     } catch (err) {
+      console.log(err);
       return {
         status: 500,
-        message: err.message,
+        message: "Internal server error",
       };
     }
   }
-
-  // @Post()
-  // create(@Body() createAuthDto: CreateAuthDto) {
-  //   return this.authService.create(createAuthDto);
-  // }
-
-  // @Get()
-  // findAll() {
-  //   return this.authService.findAll();
-  // }
-
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   return this.authService.findOne(+id);
-  // }
-
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateAuthDto: UpdateAuthDto) {
-  //   return this.authService.update(+id, updateAuthDto);
-  // }
-
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.authService.remove(+id);
-  // }
 }

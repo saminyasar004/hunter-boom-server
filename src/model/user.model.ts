@@ -15,6 +15,7 @@ export interface UserProps {
   userLevel: string;
   permission: string;
   username: string;
+  email: string;
   password: string;
   status: string;
   isDeleted: boolean;
@@ -29,6 +30,7 @@ export interface UserCreationProps {
   userLevel: string;
   permission: string;
   username: string;
+  email: string;
   password: string;
   status: string;
   isDeleted: boolean;
@@ -49,6 +51,12 @@ export default class User extends Model<UserProps, UserCreationProps> {
     allowNull: false,
   })
   declare username: string;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+  })
+  declare email: string;
 
   @Column({
     type: DataType.STRING,
