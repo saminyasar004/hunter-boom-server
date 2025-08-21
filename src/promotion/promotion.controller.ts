@@ -1,21 +1,102 @@
 import {
-  Body,
   Controller,
-  InternalServerErrorException,
   Post,
+  Body,
+  UsePipes,
+  ValidationPipe,
+  InternalServerErrorException,
 } from "@nestjs/common";
 import { PromotionService } from "./promotion.service";
 import { CreatePromotionDto } from "./dto/create-promotion.dto";
+import { ApiTags, ApiOperation, ApiBody, ApiResponse } from "@nestjs/swagger";
 
+/**
+ * Controller for managing promotion-related API endpoints.
+ */
+@ApiTags("promotions")
 @Controller("api/promotion")
 export class PromotionController {
   constructor(private readonly promotionService: PromotionService) {}
 
   @Post("create")
-  async createPromotion(@Body() CreatePromotionDto: CreatePromotionDto) {
+  @UsePipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    }),
+  )
+  @ApiOperation({ summary: "Create a new promotion" })
+  @ApiBody({ type: CreatePromotionDto })
+  @ApiResponse({
+    status: 201,
+    description: "Promotion created successfully",
+    schema: {
+      type: "object",
+      properties: {
+        status: { type: "number", example: 201 },
+        message: { type: "string", example: "Promotion created successfully" },
+        data: {
+          type: "object",
+          properties: {
+            id: { type: "number", example: 1 },
+            name: { type: "string", example: "Summer Sale" },
+            status: {
+              type: "string",
+              enum: ["active", "inactive"],
+              example: "active",
+            },
+            startDate: {
+              type: "string",
+              format: "date-time",
+              example: "2025-08-21T10:00:00Z",
+            },
+            endDate: {
+              type: "string",
+              format: "date-time",
+              example: "2025-08-31T23:59:59Z",
+            },
+            createdAt: {
+              type: "string",
+              format: "date-time",
+              example: "2025-08-21T07:35:00Z",
+            },
+            updatedAt: {
+              type: "string",
+              format: "date-time",
+              example: "2025-08-21T07:35:00Z",
+            },
+          },
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 400,
+    description: "Invalid input data",
+    schema: {
+      type: "object",
+      properties: {
+        status: { type: "number", example: 400 },
+        message: { type: "string", example: "Invalid input data" },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 500,
+    description: "Internal server error",
+    schema: {
+      type: "object",
+      properties: {
+        status: { type: "number", example: 500 },
+        message: { type: "string", example: "Internal server error" },
+      },
+    },
+  })
+  async createPromotion(@Body() createPromotionDto: CreatePromotionDto) {
     try {
       const promotion =
-        await this.promotionService.createPromotion(CreatePromotionDto);
+        await this.promotionService.createPromotion(createPromotionDto);
 
       if (!promotion) {
         return {
@@ -30,8 +111,8 @@ export class PromotionController {
         data: promotion,
       };
     } catch (err: any) {
-      console.log(err);
-      throw new InternalServerErrorException(err.message);
+      console.error("Error creating promotion:", err);
+      throw new InternalServerErrorException("Failed to create promotion");
     }
   }
 }
