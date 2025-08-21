@@ -25,14 +25,14 @@ async function bootstrap() {
   });
 
   // Swagger configuration
-  // const config = new DocumentBuilder()
-  //   .setTitle("AI Capitol API")
-  //   .setDescription("API for AI Capitol project")
-  //   .setVersion("1.0")
-  //   .build();
+  const config = new DocumentBuilder()
+    .setTitle("Hunter Boom")
+    .setDescription("API for Hunter Boom project")
+    .setVersion("1.0")
+    .build();
 
-  // const document = SwaggerModule.createDocument(app, config);
-  // SwaggerModule.setup("api/docs", app, document); // Serve Swagger UI at /api
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup("api/docs", app, document); // Serve Swagger UI at /api
 
   app.useGlobalPipes(
     new ValidationPipe({

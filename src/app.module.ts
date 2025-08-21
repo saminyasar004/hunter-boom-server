@@ -7,6 +7,7 @@ import { AuthModule } from "./auth/auth.module";
 import { AgentModule } from './agent/agent.module';
 import { AgentGroupModule } from './agent-group/agent-group.module';
 import { PromotionModule } from './promotion/promotion.module';
+import { PromotionAgentGroupModule } from './promotion-agent-group/promotion-agent-group.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { PromotionModule } from './promotion/promotion.module';
     AgentModule,
     AgentGroupModule,
     PromotionModule,
+    PromotionAgentGroupModule,
   ],
   controllers: [AppController],
   providers: [AppService],
