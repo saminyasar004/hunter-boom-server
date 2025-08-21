@@ -1,26 +1,75 @@
 import {
   Controller,
-  Get,
   Post,
   Body,
-  Patch,
-  Param,
-  Delete,
   UsePipes,
-  InternalServerErrorException,
+  ValidationPipe,
 } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { LoginDto } from "./dto/login.dto";
+import { RegisterDto } from "./dto/register.dto";
 import { ResponseProps } from "@/interfaces";
 import { comparePassword, generateJWTToken } from "@/lib";
-import { RegisterDto } from "./dto/register.dto";
+import { ApiTags, ApiOperation, ApiBody, ApiResponse } from "@nestjs/swagger";
 
+@ApiTags("auth")
 @Controller("api/auth")
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post("login")
-  async login(@Body() loginDto: LoginDto) {
+  @UsePipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    }),
+  )
+  @ApiOperation({ summary: "Log in a user with email and password" })
+  @ApiBody({ type: LoginDto })
+  @ApiResponse({
+    status: 200,
+    description: "User logged in successfully",
+    schema: {
+      type: "object",
+      properties: {
+        status: { type: "number", example: 200 },
+        message: { type: "string", example: "Login successful" },
+        token: { type: "string", example: "jwt.token.here" },
+        data: {
+          type: "object",
+          properties: {
+            id: { type: "number", example: 1 },
+            name: { type: "string", example: "John Doe" },
+            email: { type: "string", example: "admin@example.com" },
+          },
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 401,
+    description: "Invalid credentials",
+    schema: {
+      type: "object",
+      properties: {
+        status: { type: "number", example: 401 },
+        message: { type: "string", example: "Invalid credentials" },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 500,
+    description: "Internal server error",
+    schema: {
+      type: "object",
+      properties: {
+        status: { type: "number", example: 500 },
+        message: { type: "string", example: "Internal server error" },
+      },
+    },
+  })
+  async login(@Body() loginDto: LoginDto): Promise<ResponseProps> {
     try {
       const user = await this.authService.findUserByEmail(loginDto);
 
@@ -61,8 +110,70 @@ export class AuthController {
       };
     }
   }
+
   @Post("register")
-  async register(@Body() registerDto: RegisterDto) {
+  @UsePipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    }),
+  )
+  @ApiOperation({ summary: "Register a new user" })
+  @ApiBody({ type: RegisterDto })
+  @ApiResponse({
+    status: 201,
+    description: "User registered successfully",
+    schema: {
+      type: "object",
+      properties: {
+        status: { type: "number", example: 201 },
+        message: { type: "string", example: "User created successfully" },
+        token: { type: "string", example: "jwt.token.here" },
+        data: {
+          type: "object",
+          properties: {
+            id: { type: "number", example: 1 },
+            name: { type: "string", example: "John Doe" },
+            email: { type: "string", example: "admin@example.com" },
+            contactNumber: { type: "string", example: "1234567890" },
+            userGroup: { type: "string", example: "admin" },
+            userLevel: { type: "string", example: "admin" },
+            permission: { type: "string", example: "admin" },
+            username: { type: "string", example: "admin" },
+            status: { type: "string", example: "active" },
+            isDeleted: { type: "boolean", example: false },
+          },
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 401,
+    description: "User already exists with this email",
+    schema: {
+      type: "object",
+      properties: {
+        status: { type: "number", example: 401 },
+        message: {
+          type: "string",
+          example: "User already exist with this email",
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 500,
+    description: "Internal server error",
+    schema: {
+      type: "object",
+      properties: {
+        status: { type: "number", example: 500 },
+        message: { type: "string", example: "Internal server error" },
+      },
+    },
+  })
+  async register(@Body() registerDto: RegisterDto): Promise<ResponseProps> {
     try {
       const isUserExist = await this.authService.findUserByEmail(registerDto);
 
