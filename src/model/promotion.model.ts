@@ -45,7 +45,7 @@ export default class Promotion extends Model<
   declare name: string;
 
   @Column({
-    type: DataType.STRING,
+    type: DataType.ENUM("active", "inactive"),
     allowNull: false,
   })
   declare status: status;
