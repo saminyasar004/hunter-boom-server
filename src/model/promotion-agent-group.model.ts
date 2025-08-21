@@ -14,7 +14,7 @@ export interface PromotionAgentGroupProps {
   agentGroupId: number;
   minQty: number;
   maxQty: number;
-  operation: string;
+  operation: "fixed" | "percentage";
   value: number;
   isDeleted: number;
   createdAt: Date;
@@ -27,7 +27,7 @@ export interface PromotionAgentGroupCreationProps {
   agentGroupId: number;
   minQty: number;
   maxQty: number;
-  operation: string;
+  operation: "fixed" | "percentage";
   value: number;
   isDeleted: number;
 }
@@ -76,10 +76,10 @@ export default class PromotionAgentGroup extends Model<
   declare maxQty: number;
 
   @Column({
-    type: DataType.STRING,
+    type: DataType.ENUM("fixed", "percentage"),
     allowNull: false,
   })
-  declare operation: string;
+  declare operation: "fixed" | "percentage";
 
   @Column({
     type: DataType.DOUBLE,
