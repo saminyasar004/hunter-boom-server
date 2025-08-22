@@ -4,7 +4,7 @@ import { AgentGroupModule } from "./agent-group/agent-group.module";
 import { AgentModule } from "./agent/agent.module";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
-import { SequelizeModule } from "@nestjs/sequelize";
+import { AuthModule } from "./auth/auth.module";
 import { dbConnectionString } from "./config/dotenv.config";
 import { PromotionAgentGroupModule } from "./promotion-agent-group/promotion-agent-group.module";
 import { PromotionModule } from "./promotion/promotion.module";

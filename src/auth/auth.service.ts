@@ -72,11 +72,24 @@ export class AuthService {
     }
   }
 
+  async getUsers(): Promise<UserCreationProps[]> {
+    try {
+      const users = await this.userModel.findAll();
+      return users ? users.map((u) => u.toJSON()) : [];
+    } catch (err: any) {
+      console.log(err);
+      throw new InternalServerErrorException(err.message);
+    }
+  }
+
   async createUser(
     registerDto: RegisterDto,
   ): Promise<User | UserCreationProps | null> {
     try {
-      const createdUser = await this.userModel.create(registerDto);
+      const createdUser = await this.userModel.create({
+        ...registerDto,
+        password: await hashedPassword(registerDto.password),
+      });
 
       if (createdUser) {
         return createdUser.toJSON();

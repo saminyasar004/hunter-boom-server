@@ -4,6 +4,7 @@ import {
   Body,
   UsePipes,
   ValidationPipe,
+  Get,
 } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { LoginDto } from "./dto/login.dto";
@@ -16,6 +17,60 @@ import { ApiTags, ApiOperation, ApiBody, ApiResponse } from "@nestjs/swagger";
 @Controller("api/auth")
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
+
+  @Get("users")
+  @ApiOperation({ summary: "Get all users" })
+  @ApiResponse({
+    status: 200,
+    description: "Users retrieved successfully",
+    schema: {
+      type: "object",
+      properties: {
+        status: { type: "number", example: 200 },
+        message: { type: "string", example: "Users retrieved successfully" },
+        data: {
+          type: "array",
+          items: {
+            type: "object",
+            properties: {
+              id: { type: "number", example: 1 },
+              name: { type: "string", example: "John Doe" },
+              email: { type: "string", example: "admin@example.com" },
+            },
+          },
+        },
+      },
+    },
+  })
+  async getUsers() {
+    try {
+      const users = await this.authService.getUsers();
+
+      if (!users) {
+        return {
+          status: 500,
+          message: "Internal server error",
+        };
+      }
+
+      const usersWithoutPassword = users.map((user) => {
+        const { password, ...responseData } = user;
+        return responseData;
+      });
+
+      return {
+        status: 200,
+        message: "Users retrieved successfully",
+        data: usersWithoutPassword,
+      };
+    } catch (err) {
+      console.log(err);
+      return {
+        status: 500,
+        message: "Internal server error",
+      };
+    }
+  }
 
   @Post("login")
   @UsePipes(
