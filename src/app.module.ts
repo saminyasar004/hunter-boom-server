@@ -6,8 +6,10 @@ import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
 import { AuthModule } from "./auth/auth.module";
 import { dbConnectionString } from "./config/dotenv.config";
+import { ProductModule } from "./product/product.module";
 import { PromotionAgentGroupModule } from "./promotion-agent-group/promotion-agent-group.module";
 import { PromotionModule } from "./promotion/promotion.module";
+import { OrderModule } from "./order/order.module";
 
 @Module({
   imports: [
@@ -28,8 +30,11 @@ import { PromotionModule } from "./promotion/promotion.module";
     AgentGroupModule,
     PromotionModule,
     PromotionAgentGroupModule,
+    ProductModule,
+    // OrderModule,
   ],
   controllers: [AppController],
   providers: [AppService],
+  exports: [SequelizeModule],
 })
 export class AppModule {}
