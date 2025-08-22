@@ -16,7 +16,7 @@ import {
   ApiTags,
 } from "@nestjs/swagger";
 import { AgentGroupService } from "./agent-group.service";
-import { CreateAgentGroupDto } from "./dto/create-aget-group.dto";
+import { CreateAgentGroupDto } from "./dto/create-agent-group.dto";
 
 @ApiTags("agent-groups")
 @Controller("api/agent-group")

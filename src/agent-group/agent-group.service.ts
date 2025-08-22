@@ -1,7 +1,7 @@
 import { Injectable, InternalServerErrorException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/sequelize";
 import AgentGroup, { AgentGroupProps } from "@/model/agent-group.model";
-import { CreateAgentGroupDto } from "./dto/create-aget-group.dto";
+import { CreateAgentGroupDto } from "./dto/create-agent-group.dto";
 
 /**
  * Service for managing agent groups in the database.
