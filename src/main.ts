@@ -8,9 +8,13 @@ import { join } from "path";
 import { NestExpressApplication } from "@nestjs/platform-express";
 import { ValidationError } from "class-validator";
 import { ValidationPipe, BadRequestException } from "@nestjs/common";
+import { Logger } from "@nestjs/common";
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  const logger = new Logger();
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+    logger,
+  });
 
   // Enable CORS for all origins
   app.enableCors({
@@ -21,7 +25,7 @@ async function bootstrap() {
 
   // Serve static files
   app.useStaticAssets(join(__dirname, "..", "uploads"), {
-    prefix: "/uploads/",
+    prefix: "/",
   });
 
   // Swagger configuration
