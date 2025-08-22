@@ -9,13 +9,9 @@ import {
 
 export interface AgentProps {
   agentId: number;
-  uplineAgentId?: number;
-  isTopLevel: boolean;
   code: string;
   companyName: string;
-  photo?: string;
-  tinCode?: string;
-  personInCharge: string;
+  file?: string;
   contactNumber: string;
   addContactNumber: string;
   email: string;
@@ -23,29 +19,22 @@ export interface AgentProps {
   addressPostalCode: string;
   addressCity: string;
   addressState: string;
-  icSsm: string;
   username: string;
+  name: string;
   password: string;
   agentGroupId: number;
-  blacklisted: boolean;
   isDeleted: boolean;
   accountBook: string;
-  displayTerm: string;
   creditLimit: string;
   creditTerm: string;
-  overdueLimit: number;
   createdAt: Date;
   updatedAt: Date;
 }
 
 export interface AgentCreationProps {
-  uplineAgentId: number;
-  isTopLevel: boolean;
   code: string;
   companyName: string;
-  photo?: string;
-  tinCode?: string;
-  personInCharge: string;
+  file?: string;
   contactNumber: string;
   addContactNumber: string;
   email: string;
@@ -53,18 +42,14 @@ export interface AgentCreationProps {
   addressPostalCode: string;
   addressCity: string;
   addressState: string;
-  icSsm: string;
   username: string;
   name: string;
   password: string;
   agentGroupId: number;
-  blacklisted: boolean;
   isDeleted: boolean;
   accountBook: string;
-  displayTerm: string;
   creditLimit: string;
   creditTerm: string;
-  overdueLimit: number;
 }
 
 @Table({
@@ -76,19 +61,6 @@ export default class Agent extends Model<AgentProps, AgentCreationProps> {
   @AutoIncrement
   @Column({ type: DataType.INTEGER })
   declare agentId: number;
-
-  @Column({
-    type: DataType.INTEGER,
-    allowNull: false,
-  })
-  declare uplineAgentId: number;
-
-  @Column({
-    type: DataType.BOOLEAN,
-    allowNull: false,
-    defaultValue: false,
-  })
-  declare isTopLevel: boolean;
 
   @Column({
     type: DataType.STRING,
@@ -106,19 +78,7 @@ export default class Agent extends Model<AgentProps, AgentCreationProps> {
     type: DataType.TEXT,
     allowNull: true,
   })
-  declare photo?: string;
-
-  @Column({
-    type: DataType.STRING,
-    allowNull: true,
-  })
-  declare tinCode?: string;
-
-  @Column({
-    type: DataType.STRING,
-    allowNull: false,
-  })
-  declare personInCharge: string;
+  declare file?: string;
 
   @Column({
     type: DataType.STRING,
@@ -166,12 +126,6 @@ export default class Agent extends Model<AgentProps, AgentCreationProps> {
     type: DataType.STRING,
     allowNull: false,
   })
-  declare icSsm: string;
-
-  @Column({
-    type: DataType.STRING,
-    allowNull: false,
-  })
   declare username: string;
 
   @Column({
@@ -197,13 +151,6 @@ export default class Agent extends Model<AgentProps, AgentCreationProps> {
     allowNull: false,
     defaultValue: false,
   })
-  declare blacklisted: boolean;
-
-  @Column({
-    type: DataType.BOOLEAN,
-    allowNull: false,
-    defaultValue: false,
-  })
   declare isDeleted: boolean;
 
   @Column({
@@ -216,12 +163,6 @@ export default class Agent extends Model<AgentProps, AgentCreationProps> {
     type: DataType.STRING,
     allowNull: false,
   })
-  declare displayTerm: string;
-
-  @Column({
-    type: DataType.STRING,
-    allowNull: false,
-  })
   declare creditLimit: string;
 
   @Column({
@@ -229,10 +170,4 @@ export default class Agent extends Model<AgentProps, AgentCreationProps> {
     allowNull: false,
   })
   declare creditTerm: string;
-
-  @Column({
-    type: DataType.DOUBLE,
-    allowNull: false,
-  })
-  declare overdueLimit: number;
 }
