@@ -1,8 +1,10 @@
+import { status } from "@/interfaces";
 import { ApiProperty } from "@nestjs/swagger";
 import { Transform } from "class-transformer";
 import {
   IsBoolean,
   IsEmail,
+  IsEnum,
   IsNumber,
   IsString,
   Matches,
@@ -65,7 +67,7 @@ export class CreateAgentDto {
   address: string;
 
   @ApiProperty({
-    description: "The postal code of the agent’s address",
+    description: "The postal code of the agent's address",
     example: "12345",
     required: true,
   })
@@ -161,4 +163,15 @@ export class CreateAgentDto {
   @IsString({ message: "Credit term must be a string" })
   @MinLength(3, { message: "Credit term must be at least 3 characters long" })
   creditTerm: string;
+
+  @ApiProperty({
+    description: "The status of the agent",
+    example: "active",
+    required: true,
+  })
+  @IsString({ message: "Status must be a string" })
+  @IsEnum(["active", "inactive"], {
+    message: "Status must be one of the following values: active, inactive",
+  })
+  status: status;
 }

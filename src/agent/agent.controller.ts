@@ -73,6 +73,7 @@ export class AgentController {
               accountBook: { type: "string", example: "ACC001" },
               creditLimit: { type: "string", example: "1000.00" },
               creditTerm: { type: "string", example: "30 days" },
+              status: { type: "string", example: "active" },
               createdAt: {
                 type: "string",
                 format: "date-time",
@@ -125,6 +126,7 @@ export class AgentController {
   @ApiConsumes("multipart/form-data")
   @ApiBody({
     description: "Agent data and optional file file (multipart/form-data)",
+    type: CreateAgentDto,
     schema: {
       type: "object",
       properties: {
@@ -209,6 +211,12 @@ export class AgentController {
           example: "30 days",
           description: "The credit term",
         },
+        status: {
+          type: "string",
+          enum: ["active", "inactive"],
+          description: "The status of the agent",
+          example: "active",
+        },
         file: {
           type: "string",
           format: "binary",
@@ -232,6 +240,7 @@ export class AgentController {
         "accountBook",
         "creditLimit",
         "creditTerm",
+        "status",
       ],
     },
   })
@@ -269,6 +278,7 @@ export class AgentController {
             accountBook: { type: "string", example: "ACC001" },
             creditLimit: { type: "string", example: "1000.00" },
             creditTerm: { type: "string", example: "30 days" },
+            status: { type: "string", example: "active" },
             createdAt: {
               type: "string",
               format: "date-time",

@@ -1,3 +1,4 @@
+import { status } from "@/interfaces";
 import {
   AutoIncrement,
   Column,
@@ -27,6 +28,7 @@ export interface AgentProps {
   accountBook: string;
   creditLimit: string;
   creditTerm: string;
+  status: status;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -50,6 +52,7 @@ export interface AgentCreationProps {
   accountBook: string;
   creditLimit: string;
   creditTerm: string;
+  status: status;
 }
 
 @Table({
@@ -170,4 +173,10 @@ export default class Agent extends Model<AgentProps, AgentCreationProps> {
     allowNull: false,
   })
   declare creditTerm: string;
+
+  @Column({
+    type: DataType.ENUM("active", "inactive"),
+    allowNull: false,
+  })
+  declare status: string;
 }
