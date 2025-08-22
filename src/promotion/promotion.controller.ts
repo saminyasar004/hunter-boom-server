@@ -5,6 +5,7 @@ import {
   UsePipes,
   ValidationPipe,
   InternalServerErrorException,
+  Get,
 } from "@nestjs/common";
 import { PromotionService } from "./promotion.service";
 import { CreatePromotionDto } from "./dto/create-promotion.dto";
@@ -17,6 +18,82 @@ import { ApiTags, ApiOperation, ApiBody, ApiResponse } from "@nestjs/swagger";
 @Controller("api/promotion")
 export class PromotionController {
   constructor(private readonly promotionService: PromotionService) {}
+
+  @Get()
+  @ApiOperation({ summary: "Get all promotions" })
+  @ApiResponse({
+    status: 200,
+    description: "Promotions retrieved successfully",
+    schema: {
+      type: "object",
+      properties: {
+        status: { type: "number", example: 200 },
+        message: {
+          type: "string",
+          example: "Promotions retrieved successfully",
+        },
+        data: {
+          type: "array",
+          items: {
+            type: "object",
+            properties: {
+              id: { type: "number", example: 1 },
+              name: { type: "string", example: "Summer Sale" },
+              status: {
+                type: "string",
+                enum: ["active", "inactive"],
+                example: "active",
+              },
+              startDate: {
+                type: "string",
+                format: "date-time",
+                example: "2025-08-21T10:00:00Z",
+              },
+              endDate: {
+                type: "string",
+                format: "date-time",
+                example: "2025-08-31T23:59:59Z",
+              },
+              createdAt: {
+                type: "string",
+                format: "date-time",
+                example: "2025-08-21T07:35:00Z",
+              },
+              updatedAt: {
+                type: "string",
+                format: "date-time",
+                example: "2025-08-21T07:35:00Z",
+              },
+            },
+          },
+        },
+      },
+    },
+  })
+  async getPromotions() {
+    try {
+      const promotions = await this.promotionService.getPromotions();
+
+      if (!promotions) {
+        return {
+          status: 500,
+          message: "Internal server error",
+        };
+      }
+
+      return {
+        status: 200,
+        message: "Promotions retrieved successfully",
+        data: promotions,
+      };
+    } catch (err) {
+      console.log(err);
+      return {
+        status: 500,
+        message: "Internal server error",
+      };
+    }
+  }
 
   @Post("create")
   @UsePipes(
