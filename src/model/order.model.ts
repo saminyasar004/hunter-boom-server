@@ -9,6 +9,7 @@ import {
 
 export interface OrderProps {
   orderId: number;
+  orderNumber: string;
   agentId?: string;
   partnerId?: string;
   promotionId?: number;
@@ -38,12 +39,15 @@ export interface OrderProps {
   autocountAccountId?: string;
   isDeleted: number;
   printDatetime?: Date;
+  creditTerm: string;
+  creditLimit: string;
   createdAt: Date;
   updatedAt: Date;
 }
 
 export interface OrderCreationProps {
   agentId?: string;
+  orderNumber: string;
   partnerId?: string;
   promotionId?: number;
   soNumber?: string;
@@ -72,6 +76,8 @@ export interface OrderCreationProps {
   autocountAccountId?: string;
   isDeleted: number;
   printDatetime?: Date;
+  creditTerm: string;
+  creditLimit: string;
 }
 
 @Table({
@@ -83,6 +89,12 @@ export default class Order extends Model<OrderProps, OrderCreationProps> {
   @AutoIncrement
   @Column({ type: DataType.INTEGER })
   declare orderId: number;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: true,
+  })
+  declare orderNumber?: string;
 
   @Column({
     type: DataType.STRING,

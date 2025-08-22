@@ -1,3 +1,4 @@
+import { uom } from "@/interfaces";
 import {
   AutoIncrement,
   Column,
@@ -9,12 +10,14 @@ import {
 
 export interface OrderItemProps {
   orderItemId: number;
-  productId?: number;
-  orderId?: number;
+  orderId: number;
+  productId: number;
+  productCode: string;
+  productDescription?: string;
   productQty?: number;
-  productPrice?: number;
-  productTotal?: number;
-  productUom?: string;
+  productUom: uom;
+  productUnitPrice: number;
+  productTotal: number;
   isDeleted: number;
   isReturn: number;
   createdAt: Date;
@@ -22,12 +25,14 @@ export interface OrderItemProps {
 }
 
 export interface OrderItemCreationProps {
-  productId?: number;
-  orderId?: number;
+  orderId: number;
+  productId: number;
+  productCode: string;
+  productDescription?: string;
   productQty?: number;
-  productPrice?: number;
-  productTotal?: number;
-  productUom?: string;
+  productUom: uom;
+  productUnitPrice: number;
+  productTotal: number;
   isDeleted: number;
   isReturn: number;
 }
@@ -47,39 +52,51 @@ export default class OrderItem extends Model<
 
   @Column({
     type: DataType.INTEGER,
-    allowNull: true,
+    allowNull: false,
   })
-  declare productId?: number;
+  declare productId: number;
 
   @Column({
     type: DataType.INTEGER,
-    allowNull: true,
+    allowNull: false,
   })
-  declare orderId?: number;
+  declare orderId: number;
 
   @Column({
-    type: DataType.DOUBLE,
-    allowNull: true,
+    type: DataType.STRING,
+    allowNull: false,
   })
-  declare productQty?: number;
-
-  @Column({
-    type: DataType.DOUBLE(18, 3),
-    allowNull: true,
-  })
-  declare productPrice?: number;
-
-  @Column({
-    type: DataType.DOUBLE(18, 3),
-    allowNull: true,
-  })
-  declare productTotal?: number;
+  declare productCode: string;
 
   @Column({
     type: DataType.STRING,
     allowNull: true,
   })
-  declare productUom?: string;
+  declare productDescription?: string;
+
+  @Column({
+    type: DataType.DOUBLE,
+    allowNull: false,
+  })
+  declare productQty?: number;
+
+  @Column({
+    type: DataType.ENUM("pc", "kg", "box"),
+    allowNull: false,
+  })
+  declare productUom: uom;
+
+  @Column({
+    type: DataType.DOUBLE(18, 3),
+    allowNull: false,
+  })
+  declare productUnitPrice: number;
+
+  @Column({
+    type: DataType.DOUBLE(18, 3),
+    allowNull: false,
+  })
+  declare productTotal: number;
 
   @Column({
     type: DataType.BOOLEAN,
