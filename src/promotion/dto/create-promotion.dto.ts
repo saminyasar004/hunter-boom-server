@@ -1,6 +1,6 @@
-import { IsDate, IsEnum, IsString, MinLength } from "class-validator";
-import { ApiProperty } from "@nestjs/swagger";
 import { status } from "@/interfaces";
+import { ApiProperty } from "@nestjs/swagger";
+import { IsEnum, IsISO8601, IsString, MinLength } from "class-validator";
 
 export class CreatePromotionDto {
   @ApiProperty({
@@ -28,7 +28,8 @@ export class CreatePromotionDto {
     example: "2025-08-21T10:00:00Z",
     required: true,
   })
-  @IsDate({ message: "Start date must be a valid date" })
+  @IsString()
+  @IsISO8601()
   startDate: Date;
 
   @ApiProperty({
@@ -36,6 +37,7 @@ export class CreatePromotionDto {
     example: "2025-08-31T23:59:59Z",
     required: true,
   })
-  @IsDate({ message: "End date must be a valid date" })
+  @IsString()
+  @IsISO8601()
   endDate: Date;
 }
