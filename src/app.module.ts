@@ -1,4 +1,7 @@
 import { Module } from "@nestjs/common";
+import { SequelizeModule } from "@nestjs/sequelize";
+import { AgentGroupModule } from "./agent-group/agent-group.module";
+import { AgentModule } from "./agent/agent.module";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
 import { SequelizeModule } from "@nestjs/sequelize";

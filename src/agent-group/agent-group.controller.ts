@@ -1,35 +1,83 @@
 import {
-  Controller,
-  Post,
   Body,
+  Controller,
+  Delete,
+  Get,
   Param,
+  Post,
   UsePipes,
   ValidationPipe,
 } from "@nestjs/common";
-import { AgentGroupService } from "./agent-group.service";
 import {
-  ApiTags,
-  ApiOperation,
   ApiBody,
-  ApiResponse,
+  ApiOperation,
   ApiParam,
-  ApiProperty,
+  ApiResponse,
+  ApiTags,
 } from "@nestjs/swagger";
+import { AgentGroupService } from "./agent-group.service";
 import { CreateAgentGroupDto } from "./dto/create-aget-group.dto";
-
-class DeleteAgentGroupDto {
-  @ApiProperty({
-    description: "The ID of the agent group to delete",
-    example: 1,
-    required: true,
-  })
-  id: number;
-}
 
 @ApiTags("agent-groups")
 @Controller("api/agent-group")
 export class AgentGroupController {
   constructor(private readonly agentGroupService: AgentGroupService) {}
+
+  @Get()
+  @ApiOperation({ summary: "Get all agent groups" })
+  @ApiResponse({
+    status: 200,
+    description: "Agent groups retrieved successfully",
+    schema: {
+      type: "object",
+      properties: {
+        status: { type: "number", example: 200 },
+        message: {
+          type: "string",
+          example: "Agent groups retrieved successfully",
+        },
+        data: {
+          type: "array",
+          items: {
+            type: "object",
+            properties: {
+              id: { type: "number", example: 1 },
+              name: { type: "string", example: "Support Team" },
+              status: {
+                type: "string",
+                enum: ["active", "inactive"],
+                example: "active",
+              },
+            },
+          },
+        },
+      },
+    },
+  })
+  async getAgentGroups() {
+    try {
+      const agentGroups = await this.agentGroupService.getAgentGroups();
+
+      if (!agentGroups) {
+        return {
+          status: 500,
+          message: "Internal server error",
+        };
+      }
+
+      return {
+        status: 200,
+        message: "Agent groups retrieved successfully",
+        data: agentGroups,
+      };
+    } catch (err) {
+      console.log(err);
+      return {
+        status: 500,
+        message: "Internal server error",
+      };
+    }
+  }
 
   @Post("create")
   @UsePipes(
@@ -104,7 +152,7 @@ export class AgentGroupController {
     }
   }
 
-  @Post("delete/:id")
+  @Delete("delete/:id")
   @UsePipes(
     new ValidationPipe({
       whitelist: true,

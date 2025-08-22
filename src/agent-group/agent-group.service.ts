@@ -14,6 +14,21 @@ export class AgentGroupService {
   ) {}
 
   /**
+   * Retrieves all agent groups from the database.
+   * @returns An array of agent group objects, or an empty array if no groups exist.
+   * @throws InternalServerErrorException if an error occurs during retrieval.
+   */
+  async getAgentGroups(): Promise<AgentGroupProps[]> {
+    try {
+      const agentGroups = await this.agentGroupModel.findAll();
+      return agentGroups ? agentGroups.map((ag) => ag.toJSON()) : [];
+    } catch (err: any) {
+      console.error("Error getting agent groups:", err);
+      throw new InternalServerErrorException("Failed to get agent groups");
+    }
+  }
+
+  /**
    * Creates a new agent group in the database.
    * @param createAgentGroupDto - The data transfer object containing agent group details.
    * @returns The created agent group as a plain object, or null if creation fails.
@@ -39,10 +54,20 @@ export class AgentGroupService {
    */
   async deleteAgentGroup(agentGroupId: number): Promise<boolean> {
     try {
-      const isDeleted = await this.agentGroupModel.destroy({
-        where: { agentGroupId },
-      });
-      return isDeleted > 0;
+      const isUpdated = await this.agentGroupModel.update(
+        {
+          isDeleted: true,
+        },
+        {
+          where: {
+            agentGroupId,
+          },
+        },
+      );
+      if (isUpdated) {
+        return true;
+      }
+      return false;
     } catch (err: any) {
       console.error("Error deleting agent group:", err);
       throw new InternalServerErrorException("Failed to delete agent group");
