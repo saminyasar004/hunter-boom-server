@@ -1,3 +1,4 @@
+import { uom } from "@/interfaces";
 import {
   AutoIncrement,
   Column,
@@ -9,17 +10,25 @@ import {
 
 export interface CartItemProps {
   cartItemId: number;
-  productId?: number;
-  cartId?: number;
+  productId: number;
+  productCode: string;
+  description?: string;
+  cartId: number;
   qty: number;
+  uom: uom;
+  unitPrice: number;
   createdAt: Date;
   updatedAt: Date;
 }
 
 export interface CartItemCreationProps {
   productId?: number;
-  cartId?: number;
+  cartId: number;
+  productCode: string;
+  description?: string;
   qty: number;
+  uom: uom;
+  unitPrice: number;
 }
 
 @Table({
@@ -42,6 +51,18 @@ export default class CartItem extends Model<
   declare productId?: number;
 
   @Column({
+    type: DataType.STRING,
+    allowNull: false,
+  })
+  declare productCode: string;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: true,
+  })
+  declare description?: string;
+
+  @Column({
     type: DataType.INTEGER,
     allowNull: true,
   })
@@ -52,4 +73,16 @@ export default class CartItem extends Model<
     allowNull: false,
   })
   declare qty: number;
+
+  @Column({
+    type: DataType.ENUM("pc", "kg", "box"),
+    allowNull: false,
+  })
+  declare uom: uom;
+
+  @Column({
+    type: DataType.DECIMAL(18, 3),
+    allowNull: false,
+  })
+  declare unitPrice: number;
 }
