@@ -8,9 +8,10 @@ import {
   ValidationPipe,
 } from "@nestjs/common";
 import { OrderService } from "./order.service";
-import { ApiBody, ApiOperation, ApiResponse } from "@nestjs/swagger";
+import { ApiBody, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { CreateOrderDto } from "./dto/create-order.dto";
 
+@ApiTags("orders")
 @Controller("order")
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}

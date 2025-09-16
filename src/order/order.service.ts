@@ -33,105 +33,107 @@ export class OrderService {
         where: { productId: productIds },
         transaction,
       });
+
+      console.log("products ", products);
       if (products.length !== new Set(productIds).size) {
         console.log("One or more product IDs are invalid");
         throw new BadRequestException("One or more product IDs are invalid");
       }
 
-      for (const item of createOrderDto.items) {
-        const product = products.find((p) => p.productId === item.productId);
-        if (product && product.code !== item.productCode) {
-          console.log(
-            `Product code ${item.productCode} does not match product ID ${item.productId}`,
-          );
-          throw new BadRequestException(
-            `Product code ${item.productCode} does not match product ID ${item.productId}`,
-          );
-        }
-      }
+      // for (const item of createOrderDto.items) {
+      //   const product = products.find((p) => p.productId === item.productId);
+      //   if (product && product.code !== item.productCode) {
+      //     console.log(
+      //       `Product code ${item.productCode} does not match product ID ${item.productId}`,
+      //     );
+      //     throw new BadRequestException(
+      //       `Product code ${item.productCode} does not match product ID ${item.productId}`,
+      //     );
+      //   }
+      // }
 
-      // Create the order
-      const order = await this.orderModel.create(
-        {
-          orderNumber: createOrderDto.orderNumber,
-          agentId: createOrderDto.agentId,
-          partnerId: createOrderDto.partnerId,
-          promotionId: createOrderDto.promotionId,
-          soNumber: createOrderDto.soNumber,
-          date: createOrderDto.date,
-          address: createOrderDto.address,
-          addressPostalCode: createOrderDto.addressPostalCode,
-          addressCity: createOrderDto.addressCity,
-          addressState: createOrderDto.addressState,
-          status: createOrderDto.status,
-          remark: createOrderDto.remark,
-          subTotal: createOrderDto.subTotal,
-          tax: createOrderDto.tax,
-          total: createOrderDto.total,
-          courier: createOrderDto.courier,
-          shippingPrice: createOrderDto.shippingPrice,
-          returnReason: createOrderDto.returnReason,
-          returnRemark: createOrderDto.returnRemark,
-          shippingInvoice: createOrderDto.shippingInvoice,
-          approveDate: createOrderDto.approveDate,
-          shippedDate: createOrderDto.shippedDate,
-          cancelledDate: createOrderDto.cancelledDate,
-          cancelledReason: createOrderDto.cancelledReason,
-          completedDate: createOrderDto.completedDate,
-          returnDate: createOrderDto.returnDate,
-          autocountStatus: createOrderDto.autocountStatus,
-          autocountAccountId: createOrderDto.autocountAccountId,
-          isDeleted: createOrderDto.isDeleted,
-          printDatetime: createOrderDto.printDatetime,
-          creditTerm: createOrderDto.creditTerm,
-          creditLimit: createOrderDto.creditLimit,
-        },
-        { transaction },
-      );
+      // // Create the order
+      // const order = await this.orderModel.create(
+      //   {
+      //     orderNumber: createOrderDto.orderNumber,
+      //     agentId: createOrderDto.agentId,
+      //     partnerId: createOrderDto.partnerId,
+      //     promotionId: createOrderDto.promotionId,
+      //     soNumber: createOrderDto.soNumber,
+      //     date: createOrderDto.date,
+      //     address: createOrderDto.address,
+      //     addressPostalCode: createOrderDto.addressPostalCode,
+      //     addressCity: createOrderDto.addressCity,
+      //     addressState: createOrderDto.addressState,
+      //     status: createOrderDto.status,
+      //     remark: createOrderDto.remark,
+      //     subTotal: createOrderDto.subTotal,
+      //     tax: createOrderDto.tax,
+      //     total: createOrderDto.total,
+      //     courier: createOrderDto.courier,
+      //     shippingPrice: createOrderDto.shippingPrice,
+      //     returnReason: createOrderDto.returnReason,
+      //     returnRemark: createOrderDto.returnRemark,
+      //     shippingInvoice: createOrderDto.shippingInvoice,
+      //     approveDate: createOrderDto.approveDate,
+      //     shippedDate: createOrderDto.shippedDate,
+      //     cancelledDate: createOrderDto.cancelledDate,
+      //     cancelledReason: createOrderDto.cancelledReason,
+      //     completedDate: createOrderDto.completedDate,
+      //     returnDate: createOrderDto.returnDate,
+      //     autocountStatus: createOrderDto.autocountStatus,
+      //     autocountAccountId: createOrderDto.autocountAccountId,
+      //     isDeleted: createOrderDto.isDeleted,
+      //     printDatetime: createOrderDto.printDatetime,
+      //     creditTerm: createOrderDto.creditTerm,
+      //     creditLimit: createOrderDto.creditLimit,
+      //   },
+      //   { transaction },
+      // );
 
-      // Create order items
-      const orderItems = createOrderDto.items.map((item) => ({
-        orderId: order.orderId,
-        productId: item.productId,
-        productCode: item.productCode,
-        productDescription: item.productDescription,
-        productQty: item.productQty,
-        productUom: item.productUom,
-        productUnitPrice: item.productUnitPrice,
-        productTotal: item.productTotal,
-        isDeleted: item.isDeleted,
-        isReturn: item.isReturn,
-      }));
+      // // Create order items
+      // const orderItems = createOrderDto.items.map((item) => ({
+      //   orderId: order.orderId,
+      //   productId: item.productId,
+      //   productCode: item.productCode,
+      //   productDescription: item.productDescription,
+      //   productQty: item.productQty,
+      //   productUom: item.productUom,
+      //   productUnitPrice: item.productUnitPrice,
+      //   productTotal: item.productTotal,
+      //   isDeleted: item.isDeleted,
+      //   isReturn: item.isReturn,
+      // }));
 
-      await this.orderItemModel.bulkCreate(orderItems, {
-        transaction,
-        validate: true,
-      });
+      // await this.orderItemModel.bulkCreate(orderItems, {
+      //   transaction,
+      //   validate: true,
+      // });
 
-      await transaction.commit();
-      console.log(
-        `Order ${order.orderNumber} created with ${orderItems.length} items`,
-      );
+      // await transaction.commit();
+      // console.log(
+      //   `Order ${order.orderNumber} created with ${orderItems.length} items`,
+      // );
 
       return {
         status: 201,
         message: "Order created successfully",
-        data: {
-          ...order.toJSON(),
-          items: orderItems,
-        },
+        // data: {
+        //   ...order.toJSON(),
+        //   items: orderItems,
+        // },
       };
     } catch (error) {
-      await transaction.rollback();
+      // await transaction.rollback();
       console.log("Error creating order:", error.message, error.stack);
-      if (error.name === "SequelizeForeignKeyConstraintError") {
-        throw new BadRequestException("Invalid product ID reference");
-      }
-      if (error.name === "SequelizeValidationError") {
-        console.log(error.errors.map((e) => e.message));
-        throw new BadRequestException(error.errors.map((e) => e.message));
-      }
-      throw error;
+      // if (error.name === "SequelizeForeignKeyConstraintError") {
+      //   throw new BadRequestException("Invalid product ID reference");
+      // }
+      // if (error.name === "SequelizeValidationError") {
+      //   console.log(error.errors.map((e) => e.message));
+      //   throw new BadRequestException(error.errors.map((e) => e.message));
+      // }
+      // throw error;
     }
   }
 }
