@@ -3,6 +3,7 @@ import { CreateAgentDto } from "./dto/create-agent.dto";
 import Agent, { AgentCreationProps } from "@/model/agent.model";
 import { InjectModel } from "@nestjs/sequelize";
 import { hashedPassword } from "@/lib";
+import { UpdateAgentDto } from "./dto/update-agent.dto";
 
 @Injectable()
 export class AgentService {
@@ -15,6 +16,26 @@ export class AgentService {
     try {
       const agents = await this.agentModel.findAll();
       return agents;
+    } catch (err: any) {
+      console.log(err);
+      throw new InternalServerErrorException(err.message);
+    }
+  }
+
+  async findAgentById(
+    agentId: number,
+  ): Promise<Agent | AgentCreationProps | null> {
+    try {
+      const agent = await this.agentModel.findOne({
+        where: {
+          agentId,
+        },
+      });
+
+      if (agent) {
+        return agent.toJSON();
+      }
+      return null;
     } catch (err: any) {
       console.log(err);
       throw new InternalServerErrorException(err.message);
@@ -37,6 +58,51 @@ export class AgentService {
         return agent.toJSON();
       }
       return null;
+    } catch (err: any) {
+      console.log(err);
+      throw new InternalServerErrorException(err.message);
+    }
+  }
+
+  async editAgent(
+    agentId: number,
+    updateAgentDto: UpdateAgentDto,
+  ): Promise<Agent | AgentCreationProps | null> {
+    try {
+      const updatedAgent = await this.agentModel.update(
+        {
+          ...updateAgentDto,
+          password: await hashedPassword(updateAgentDto.password),
+        },
+        {
+          where: {
+            agentId,
+          },
+        },
+      );
+
+      if (updatedAgent) {
+        return this.findAgentById(agentId);
+      }
+      return null;
+    } catch (err: any) {
+      console.log(err);
+      throw new InternalServerErrorException(err.message);
+    }
+  }
+
+  async deleteAgent(agentId: number): Promise<boolean> {
+    try {
+      const deletedAgent = await this.agentModel.destroy({
+        where: {
+          agentId,
+        },
+      });
+
+      if (deletedAgent) {
+        return true;
+      }
+      return false;
     } catch (err: any) {
       console.log(err);
       throw new InternalServerErrorException(err.message);

@@ -9,6 +9,9 @@ import {
   UploadedFile,
   UseInterceptors,
   Get,
+  Param,
+  Put,
+  Delete,
 } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { AgentService } from "./agent.service";
@@ -23,6 +26,9 @@ import {
 import { diskStorage } from "multer";
 import { extname, join } from "path";
 import { unlink, unlinkSync } from "fs";
+import { UpdateAgentDto } from "./dto/update-agent.dto";
+import { generateJWTToken } from "@/lib";
+import { ResponseProps } from "@/interfaces";
 
 /**
  * Controller for managing agent-related API endpoints.
@@ -381,6 +387,250 @@ export class AgentController {
       throw new InternalServerErrorException(
         "Failed to create agent: " + err.message,
       );
+    }
+  }
+
+  @Put("agents/:agentId")
+  @ApiOperation({ summary: "Update an agent" })
+  @ApiBody({ type: UpdateAgentDto })
+  @ApiResponse({
+    status: 200,
+    description: "Agent updated successfully",
+    schema: {
+      type: "object",
+      properties: {
+        status: { type: "number", example: 200 },
+        message: { type: "string", example: "Agent updated successfully" },
+        data: {
+          type: "object",
+          properties: {
+            agentId: { type: "number", example: 1 },
+            code: { type: "string", example: "AGT001" },
+            companyName: { type: "string", example: "Acme Corp" },
+            file: {
+              type: "string",
+              example: "hunter_upload-1629876543210.jpg",
+              nullable: true,
+            },
+            contactNumber: { type: "string", example: "+1234567890" },
+            addContactNumber: { type: "string", example: "+0987654321" },
+            email: { type: "string", example: "agent@example.com" },
+            address: { type: "string", example: "123 Main St" },
+            addressPostalCode: { type: "string", example: "12345" },
+            addressCity: { type: "string", example: "New York" },
+            addressState: { type: "string", example: "NY" },
+            username: { type: "string", example: "agent123" },
+            name: { type: "string", example: "John Doe" },
+            password: { type: "string", example: "[hidden]" },
+            agentGroupId: { type: "number", example: 1 },
+            isDeleted: { type: "boolean", example: false },
+            accountBook: { type: "string", example: "ACC001" },
+            creditLimit: { type: "string", example: "1000.00" },
+            creditTerm: { type: "string", example: "30 days" },
+            status: { type: "string", example: "active" },
+            createdAt: {
+              type: "string",
+              format: "date-time",
+              example: "2025-08-22T12:30:00Z",
+            },
+            updatedAt: {
+              type: "string",
+              format: "date-time",
+              example: "2025-08-22T12:30:00Z",
+            },
+          },
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 400,
+    description: "Invalid input data or file",
+    schema: {
+      type: "object",
+      properties: {
+        statusCode: { type: "number", example: 400 },
+        message: {
+          type: "array",
+          items: { type: "string" },
+          example: [
+            "Email must be a valid email address",
+            "Invalid file type. Only JPEG, PNG, and GIF are allowed.",
+          ],
+        },
+        error: { type: "string", example: "Bad Request" },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 500,
+    description: "Internal server error",
+    schema: {
+      type: "object",
+      properties: {
+        status: { type: "number", example: 500 },
+        message: { type: "string", example: "Internal server error" },
+      },
+    },
+  })
+  async updateAgent(
+    @Param("agentId") agentId: number,
+    @Body() updateAgentDto: UpdateAgentDto,
+  ) {
+    try {
+      const isAgentExist = await this.agentService.findAgentById(agentId);
+
+      if (!isAgentExist) {
+        return {
+          status: 400,
+          message: "Invalid agent ID",
+        };
+      }
+
+      const updatedAgent = await this.agentService.editAgent(
+        agentId,
+        updateAgentDto,
+      );
+
+      if (!updatedAgent) {
+        return {
+          status: 500,
+          message: "Internal server error",
+        };
+      }
+
+      const { password, ...responseData } = updatedAgent;
+
+      const token = generateJWTToken(responseData);
+
+      return {
+        status: 200,
+        message: "Agent updated successfully",
+        token,
+        data: responseData,
+      };
+    } catch (err) {
+      console.log(err);
+      return {
+        status: 500,
+        message: "Internal server error",
+      };
+    }
+  }
+
+  @Delete("agents/:agentId")
+  @ApiOperation({ summary: "Delete an agent" })
+  @ApiResponse({
+    status: 200,
+    description: "Agent deleted successfully",
+    schema: {
+      type: "object",
+      properties: {
+        status: { type: "number", example: 200 },
+        message: { type: "string", example: "Agent deleted successfully" },
+        data: {
+          type: "object",
+          properties: {
+            agentId: { type: "number", example: 1 },
+            code: { type: "string", example: "AGT001" },
+            companyName: { type: "string", example: "Acme Corp" },
+            file: {
+              type: "string",
+              example: "hunter_upload-1629876543210.jpg",
+              nullable: true,
+            },
+            contactNumber: { type: "string", example: "+1234567890" },
+            addContactNumber: { type: "string", example: "+0987654321" },
+            email: { type: "string", example: "agent@example.com" },
+            address: { type: "string", example: "123 Main St" },
+            addressPostalCode: { type: "string", example: "12345" },
+            addressCity: { type: "string", example: "New York" },
+            addressState: { type: "string", example: "NY" },
+            username: { type: "string", example: "agent123" },
+            name: { type: "string", example: "John Doe" },
+            password: { type: "string", example: "[hidden]" },
+            agentGroupId: { type: "number", example: 1 },
+            isDeleted: { type: "boolean", example: false },
+            accountBook: { type: "string", example: "ACC001" },
+            creditLimit: { type: "string", example: "1000.00" },
+            creditTerm: { type: "string", example: "30 days" },
+            status: { type: "string", example: "active" },
+            createdAt: {
+              type: "string",
+              format: "date-time",
+              example: "2025-08-22T12:30:00Z",
+            },
+            updatedAt: {
+              type: "string",
+              format: "date-time",
+              example: "2025-08-22T12:30:00Z",
+            },
+          },
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 400,
+    description: "Invalid input data or file",
+    schema: {
+      type: "object",
+      properties: {
+        statusCode: { type: "number", example: 400 },
+        message: {
+          type: "array",
+          items: { type: "string" },
+          example: [
+            "Email must be a valid email address",
+            "Invalid file type. Only JPEG, PNG, and GIF are allowed.",
+          ],
+        },
+        error: { type: "string", example: "Bad Request" },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 500,
+    description: "Internal server error",
+    schema: {
+      type: "object",
+      properties: {
+        status: { type: "number", example: 500 },
+        message: { type: "string", example: "Internal server error" },
+      },
+    },
+  })
+  async deleteAgent(@Param("agentId") agentId: number): Promise<ResponseProps> {
+    try {
+      const isAgentExist = await this.agentService.findAgentById(agentId);
+
+      if (!isAgentExist) {
+        return {
+          status: 400,
+          message: "Invalid agent ID",
+        };
+      }
+
+      const deletedAgent = await this.agentService.deleteAgent(agentId);
+
+      if (!deletedAgent) {
+        return {
+          status: 500,
+          message: "Internal server error",
+        };
+      }
+
+      return {
+        status: 200,
+        message: "Agent deleted successfully",
+        data: deletedAgent,
+      };
+    } catch (err) {
+      console.log(err);
+      return {
+        status: 500,
+        message: "Internal server error",
+      };
     }
   }
 }
