@@ -57,7 +57,7 @@ async function bootstrap() {
     }),
   );
 
-  await app.listen(port ?? 3000, () => {
+  await app.listen(port ?? 3000, "0.0.0.0", () => {
     console.log(`Server is running on port ${port}`.green);
     initializeDatabase();
   });
