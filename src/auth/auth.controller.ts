@@ -5,6 +5,9 @@ import {
   UsePipes,
   ValidationPipe,
   Get,
+  Put,
+  Param,
+  Delete,
 } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { LoginDto } from "./dto/login.dto";
@@ -12,6 +15,7 @@ import { RegisterDto } from "./dto/register.dto";
 import { ResponseProps } from "@/interfaces";
 import { comparePassword, generateJWTToken } from "@/lib";
 import { ApiTags, ApiOperation, ApiBody, ApiResponse } from "@nestjs/swagger";
+import { UpdateUserDto } from "./dto/update-user.dto";
 
 @ApiTags("auth")
 @Controller("api/auth")
@@ -166,6 +170,95 @@ export class AuthController {
     }
   }
 
+  @Put("users/:userId")
+  @ApiOperation({ summary: "Update a user" })
+  @ApiBody({ type: UpdateUserDto })
+  @ApiResponse({
+    status: 200,
+    description: "User updated successfully",
+    schema: {
+      type: "object",
+      properties: {
+        status: { type: "number", example: 200 },
+        message: { type: "string", example: "User updated successfully" },
+        data: {
+          type: "object",
+          properties: {
+            id: { type: "number", example: 1 },
+            name: { type: "string", example: "John Doe" },
+            email: { type: "string", example: "admin@example.com" },
+          },
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 401,
+    description: "Invalid credentials",
+    schema: {
+      type: "object",
+      properties: {
+        status: { type: "number", example: 401 },
+        message: { type: "string", example: "Invalid credentials" },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 500,
+    description: "Internal server error",
+    schema: {
+      type: "object",
+      properties: {
+        status: { type: "number", example: 500 },
+        message: { type: "string", example: "Internal server error" },
+      },
+    },
+  })
+  async updateUser(
+    @Param("userId") userId: number,
+    @Body() updateUserDto: UpdateUserDto,
+  ): Promise<ResponseProps> {
+    try {
+      const isUserExist = await this.authService.findUserByEmail(updateUserDto);
+
+      if (!isUserExist) {
+        return {
+          status: 401,
+          message: "Invalid credentials",
+        };
+      }
+
+      const updatedUser = await this.authService.editUser(
+        userId,
+        updateUserDto,
+      );
+
+      if (!updatedUser) {
+        return {
+          status: 500,
+          message: "Internal server error",
+        };
+      }
+
+      const { password, ...responseData } = updatedUser;
+
+      const token = generateJWTToken(responseData);
+
+      return {
+        status: 200,
+        message: "User updated successfully",
+        token,
+        data: responseData,
+      };
+    } catch (err) {
+      console.log(err);
+      return {
+        status: 500,
+        message: "Internal server error",
+      };
+    }
+  }
+
   @Post("register")
   @UsePipes(
     new ValidationPipe({
@@ -257,6 +350,83 @@ export class AuthController {
         message: "User created successfully",
         token,
         data: responseData,
+      };
+    } catch (err) {
+      console.log(err);
+      return {
+        status: 500,
+        message: "Internal server error",
+      };
+    }
+  }
+
+  @Delete("users/:userId")
+  @ApiOperation({ summary: "Delete a user" })
+  @ApiResponse({
+    status: 200,
+    description: "User deleted successfully",
+    schema: {
+      type: "object",
+      properties: {
+        status: { type: "number", example: 200 },
+        message: { type: "string", example: "User deleted successfully" },
+        data: {
+          type: "object",
+          properties: {
+            id: { type: "number", example: 1 },
+            name: { type: "string", example: "John Doe" },
+            email: { type: "string", example: "admin@example.com" },
+          },
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 401,
+    description: "Invalid credentials",
+    schema: {
+      type: "object",
+      properties: {
+        status: { type: "number", example: 401 },
+        message: { type: "string", example: "Invalid credentials" },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 500,
+    description: "Internal server error",
+    schema: {
+      type: "object",
+      properties: {
+        status: { type: "number", example: 500 },
+        message: { type: "string", example: "Internal server error" },
+      },
+    },
+  })
+  async deleteUser(@Param("userId") userId: number): Promise<ResponseProps> {
+    try {
+      const isUserExist = await this.authService.findUserById(userId);
+
+      if (!isUserExist) {
+        return {
+          status: 401,
+          message: "Invalid credentials",
+        };
+      }
+
+      const deletedUser = await this.authService.deleteUser(userId);
+
+      if (!deletedUser) {
+        return {
+          status: 500,
+          message: "Internal server error",
+        };
+      }
+
+      return {
+        status: 200,
+        message: "User deleted successfully",
+        data: deletedUser,
       };
     } catch (err) {
       console.log(err);

@@ -11,6 +11,7 @@ import {
   defaultAdminUsername,
 } from "@/config/dotenv.config";
 import { RegisterDto } from "./dto/register.dto";
+import { UpdateUserDto } from "./dto/update-user.dto";
 
 @Injectable()
 export class AuthService {
@@ -72,10 +73,55 @@ export class AuthService {
     }
   }
 
+  async findUserById(userId: number): Promise<User | UserCreationProps | null> {
+    try {
+      const user = await this.userModel.findOne({
+        where: {
+          userId,
+        },
+      });
+
+      if (user) {
+        return user.toJSON();
+      }
+      return null;
+    } catch (err: any) {
+      console.log(err);
+      throw new InternalServerErrorException(err.message);
+    }
+  }
+
   async getUsers(): Promise<UserCreationProps[]> {
     try {
       const users = await this.userModel.findAll();
       return users ? users.map((u) => u.toJSON()) : [];
+    } catch (err: any) {
+      console.log(err);
+      throw new InternalServerErrorException(err.message);
+    }
+  }
+
+  async editUser(
+    userId: number,
+    updateUserDto: UpdateUserDto,
+  ): Promise<User | UserCreationProps | null> {
+    try {
+      const updatedUser = await this.userModel.update(
+        {
+          ...updateUserDto,
+          password: await hashedPassword(updateUserDto.password),
+        },
+        {
+          where: {
+            userId,
+          },
+        },
+      );
+
+      if (updatedUser) {
+        return this.findUserByEmail(updateUserDto);
+      }
+      return null;
     } catch (err: any) {
       console.log(err);
       throw new InternalServerErrorException(err.message);
@@ -95,6 +141,24 @@ export class AuthService {
         return createdUser.toJSON();
       }
       return null;
+    } catch (err: any) {
+      console.log(err);
+      throw new InternalServerErrorException(err.message);
+    }
+  }
+
+  async deleteUser(userId: number): Promise<boolean> {
+    try {
+      const deletedUser = await this.userModel.destroy({
+        where: {
+          userId,
+        },
+      });
+
+      if (deletedUser) {
+        return true;
+      }
+      return false;
     } catch (err: any) {
       console.log(err);
       throw new InternalServerErrorException(err.message);
