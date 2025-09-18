@@ -34,7 +34,7 @@ import { ResponseProps } from "@/interfaces";
  * Controller for managing agent-related API endpoints.
  */
 @ApiTags("agents")
-@Controller("api/agent")
+@Controller("api/agents")
 export class AgentController {
   constructor(private readonly agentService: AgentService) {}
 
@@ -390,7 +390,7 @@ export class AgentController {
     }
   }
 
-  @Put("agents/:agentId")
+  @Put("/:agentId")
   @ApiOperation({ summary: "Update an agent" })
   @ApiBody({ type: UpdateAgentDto })
   @ApiResponse({
@@ -518,7 +518,7 @@ export class AgentController {
     }
   }
 
-  @Delete("agents/:agentId")
+  @Delete("/:agentId")
   @ApiOperation({ summary: "Delete an agent" })
   @ApiResponse({
     status: 200,
