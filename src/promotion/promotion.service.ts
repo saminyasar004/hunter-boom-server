@@ -46,4 +46,67 @@ export class PromotionService {
       throw new InternalServerErrorException("Failed to create promotion");
     }
   }
+
+  /**
+   * Deletes an existing promotion by its ID.
+   * @param id - The ID of the promotion to delete.
+   * @returns True if the promotion was deleted, false otherwise.
+   * @throws InternalServerErrorException if an error occurs during deletion.
+   */
+  async deletePromotion(id: number): Promise<boolean> {
+    try {
+      const isDeleted = await this.promotionModel.destroy({
+        where: { promotionId: id },
+      });
+      if (isDeleted) {
+        return true;
+      }
+      return false;
+    } catch (err: any) {
+      console.error("Error deleting promotion:", err);
+      throw new InternalServerErrorException("Failed to delete promotion");
+    }
+  }
+
+  /**
+   * Retrieves an existing promotion by its ID.
+   * @param id - The ID of the promotion to retrieve.
+   * @returns The promotion as a plain object, or null if not found.
+   * @throws InternalServerErrorException if an error occurs during retrieval.
+   */
+  async findPromotionById(id: number): Promise<PromotionCreationProps | null> {
+    try {
+      const promotion = await this.promotionModel.findByPk(id);
+      return promotion ? promotion.toJSON() : null;
+    } catch (err: any) {
+      console.error("Error getting promotion by ID:", err);
+      throw new InternalServerErrorException("Failed to get promotion by ID");
+    }
+  }
+
+  /**
+   * Updates an existing promotion in the database.
+   * @param id - The ID of the promotion to update.
+   * @param updatePromotionDto - The data transfer object containing updated promotion details.
+   * @returns The updated promotion as a plain object, or null if update fails.
+   * @throws InternalServerErrorException if an error occurs during update.
+   */
+  async updatePromotion(
+    id: number,
+    updatePromotionDto: CreatePromotionDto,
+  ): Promise<PromotionCreationProps | null> {
+    try {
+      const isUpdated = await this.promotionModel.update(updatePromotionDto, {
+        where: { promotionId: id },
+      });
+
+      if (isUpdated) {
+        return this.findPromotionById(id);
+      }
+      return null;
+    } catch (err: any) {
+      console.error("Error updating promotion:", err);
+      throw new InternalServerErrorException("Failed to update promotion");
+    }
+  }
 }
