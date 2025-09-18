@@ -2,11 +2,15 @@ import {
   AutoIncrement,
   Column,
   DataType,
+  HasMany,
   Model,
   PrimaryKey,
   Table,
 } from "sequelize-typescript";
 import { status } from "../interfaces";
+import PromotionProduct, {
+  PromotionProductProps,
+} from "./promotion-product.model";
 
 export interface PromotionProps {
   promotionId: number;
@@ -14,6 +18,7 @@ export interface PromotionProps {
   status: status;
   startDate: Date;
   endDate: Date;
+  promotionProducts: PromotionProduct[]; // Updated to use model type
   createdAt: Date;
   updatedAt: Date;
 }
@@ -61,4 +66,7 @@ export default class Promotion extends Model<
     allowNull: false,
   })
   declare endDate: Date;
+
+  @HasMany(() => PromotionProduct, "promotionId")
+  declare promotionProducts: PromotionProduct[];
 }

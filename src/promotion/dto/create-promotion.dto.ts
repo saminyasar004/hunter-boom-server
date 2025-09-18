@@ -1,6 +1,13 @@
 import { status } from "@/interfaces";
+import { PromotionProductCreationProps } from "@/model/promotion-product.model";
 import { ApiProperty } from "@nestjs/swagger";
-import { IsEnum, IsISO8601, IsString, MinLength } from "class-validator";
+import {
+  IsArray,
+  IsEnum,
+  IsISO8601,
+  IsString,
+  MinLength,
+} from "class-validator";
 
 export class CreatePromotionDto {
   @ApiProperty({
@@ -40,4 +47,21 @@ export class CreatePromotionDto {
   @IsString()
   @IsISO8601()
   endDate: Date;
+
+  @ApiProperty({
+    description: "The promotion products associated with the promotion",
+    example: [
+      {
+        productId: 1,
+        agentId: 1,
+        minimumQuantity: 1,
+        maximumQuantity: 1,
+        operationType: "fixed",
+        value: 1,
+      },
+    ],
+    required: true,
+  })
+  @IsArray()
+  promotionProducts: PromotionProductCreationProps[];
 }

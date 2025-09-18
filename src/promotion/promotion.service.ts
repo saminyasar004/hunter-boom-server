@@ -2,6 +2,8 @@ import { Injectable, InternalServerErrorException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/sequelize";
 import Promotion, { PromotionCreationProps } from "@/model/promotion.model";
 import { CreatePromotionDto } from "./dto/create-promotion.dto";
+import PromotionProduct from "@/model/promotion-product.model";
+import { UpdatePromotionDto } from "./dto/update-promotion.dto";
 
 /**
  * Service for managing promotions in the database.
@@ -11,6 +13,9 @@ export class PromotionService {
   constructor(
     @InjectModel(Promotion)
     private readonly promotionModel: typeof Promotion,
+
+    @InjectModel(PromotionProduct)
+    private readonly promotionProductModel: typeof PromotionProduct,
   ) {}
 
   /**
@@ -21,7 +26,14 @@ export class PromotionService {
    */
   async getPromotions(): Promise<PromotionCreationProps[]> {
     try {
-      const promotions = await this.promotionModel.findAll();
+      const promotions = await this.promotionModel.findAll({
+        include: [
+          {
+            model: PromotionProduct,
+            as: "promotionProducts",
+          },
+        ],
+      });
       return promotions ? promotions.map((p) => p.toJSON()) : [];
     } catch (err: any) {
       console.error("Error getting promotions:", err);
@@ -39,7 +51,24 @@ export class PromotionService {
     createPromotionDto: CreatePromotionDto,
   ): Promise<PromotionCreationProps | null> {
     try {
-      const promotion = await this.promotionModel.create(createPromotionDto);
+      const promotion = await this.promotionModel.create({
+        ...createPromotionDto,
+      });
+
+      createPromotionDto.promotionProducts.forEach((product) => {
+        product.promotionId = promotion.promotionId;
+      });
+
+      if (promotion) {
+        const promotionProducts = await this.promotionProductModel.bulkCreate(
+          createPromotionDto.promotionProducts,
+        );
+
+        console.log("LOOK AT HERE...");
+
+        console.log(promotionProducts);
+      }
+
       return promotion ? promotion.toJSON() : null;
     } catch (err: any) {
       console.error("Error creating promotion:", err);
@@ -93,7 +122,7 @@ export class PromotionService {
    */
   async updatePromotion(
     id: number,
-    updatePromotionDto: CreatePromotionDto,
+    updatePromotionDto: UpdatePromotionDto,
   ): Promise<PromotionCreationProps | null> {
     try {
       const isUpdated = await this.promotionModel.update(updatePromotionDto, {

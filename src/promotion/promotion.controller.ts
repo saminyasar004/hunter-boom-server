@@ -60,6 +60,25 @@ export class PromotionController {
                 format: "date-time",
                 example: "2025-08-31T23:59:59Z",
               },
+              promotionProducts: {
+                type: "array",
+                items: {
+                  type: "object",
+                  properties: {
+                    productId: { type: "number", example: 1 },
+                    promotionId: { type: "number", example: 1 },
+                    agentId: { type: "number", example: 1 },
+                    minimumQuantity: { type: "number", example: 1 },
+                    maximumQuantity: { type: "number", example: 1 },
+                    operationType: {
+                      type: "string",
+                      enum: ["fixed", "percentage"],
+                      example: "fixed",
+                    },
+                    value: { type: "number", example: 1 },
+                  },
+                },
+              },
               createdAt: {
                 type: "string",
                 format: "date-time",
