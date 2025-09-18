@@ -2,6 +2,7 @@ import { Injectable, InternalServerErrorException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/sequelize";
 import AgentGroup, { AgentGroupProps } from "@/model/agent-group.model";
 import { CreateAgentGroupDto } from "./dto/create-agent-group.dto";
+import { UpdateAgentGroupDto } from "./dto/update-agent-group.dto";
 
 /**
  * Service for managing agent groups in the database.
@@ -25,6 +26,24 @@ export class AgentGroupService {
     } catch (err: any) {
       console.error("Error getting agent groups:", err);
       throw new InternalServerErrorException("Failed to get agent groups");
+    }
+  }
+
+  /**
+   * Retrieves an agent group by its ID.
+   * @param agentGroupId - The ID of the agent group to retrieve.
+   * @returns The agent group as a plain object, or null if not found.
+   * @throws InternalServerErrorException if an error occurs during retrieval.
+   */
+  async findAgentGroupById(
+    agentGroupId: number,
+  ): Promise<AgentGroupProps | null> {
+    try {
+      const agentGroup = await this.agentGroupModel.findByPk(agentGroupId);
+      return agentGroup ? agentGroup.toJSON() : null;
+    } catch (err: any) {
+      console.error("Error getting agent group by ID:", err);
+      throw new InternalServerErrorException("Failed to get agent group by ID");
     }
   }
 
@@ -71,6 +90,39 @@ export class AgentGroupService {
     } catch (err: any) {
       console.error("Error deleting agent group:", err);
       throw new InternalServerErrorException("Failed to delete agent group");
+    }
+  }
+
+  /**
+   * Updates an agent group in the database.
+   * @param agentGroupId - The ID of the agent group to update.
+   * @param updateAgentGroupDto - The data transfer object containing updated agent group details.
+   * @returns The updated agent group as a plain object, or null if update fails.
+   * @throws InternalServerErrorException if an error occurs during update.
+   */
+  async editAgentGroup(
+    agentGroupId: number,
+    updateAgentGroupDto: UpdateAgentGroupDto,
+  ): Promise<AgentGroupProps | null> {
+    try {
+      const updatedAgentGroup = await this.agentGroupModel.update(
+        {
+          ...updateAgentGroupDto,
+        },
+        {
+          where: {
+            agentGroupId,
+          },
+        },
+      );
+
+      if (updatedAgentGroup) {
+        return this.findAgentGroupById(agentGroupId);
+      }
+      return null;
+    } catch (err: any) {
+      console.log(err);
+      throw new InternalServerErrorException(err.message);
     }
   }
 }
