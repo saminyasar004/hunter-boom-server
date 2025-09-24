@@ -1,10 +1,8 @@
 import OrderItem from "@/model/order-item.model";
-import Order from "@/model/order.model";
-import { BadRequestException, Injectable } from "@nestjs/common";
+import Order, { OrderProps } from "@/model/order.model";
+import { Injectable, InternalServerErrorException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/sequelize";
 import { CreateOrderDto } from "./dto/create-order.dto";
-import { Sequelize } from "sequelize";
-import Product from "@/model/product.model";
 
 @Injectable()
 export class OrderService {
@@ -13,127 +11,145 @@ export class OrderService {
     private readonly orderModel: typeof Order,
     @InjectModel(OrderItem)
     private readonly orderItemModel: typeof OrderItem,
-    @InjectModel(Product)
-    private readonly productModel: typeof Product,
-    private readonly sequelize: Sequelize,
   ) {}
 
-  async createOrder(createOrderDto: CreateOrderDto) {
-    const transaction = await this.sequelize.transaction();
+  async getAllOrders(): Promise<OrderProps[]> {
     try {
-      // Validate order items
-      if (createOrderDto.items.length === 0) {
-        console.log("Order must include at least one item");
-        throw new BadRequestException("Order must include at least one item");
-      }
-
-      // Validate product IDs and codes
-      const productIds = createOrderDto.items.map((item) => item.productId);
-      const products = await this.productModel.findAll({
-        where: { productId: productIds },
-        transaction,
+      const orders = await this.orderModel.findAll({
+        include: [
+          {
+            model: OrderItem,
+            as: "orderItems",
+          },
+        ],
       });
-
-      console.log("products ", products);
-      if (products.length !== new Set(productIds).size) {
-        console.log("One or more product IDs are invalid");
-        throw new BadRequestException("One or more product IDs are invalid");
-      }
-
-      // for (const item of createOrderDto.items) {
-      //   const product = products.find((p) => p.productId === item.productId);
-      //   if (product && product.code !== item.productCode) {
-      //     console.log(
-      //       `Product code ${item.productCode} does not match product ID ${item.productId}`,
-      //     );
-      //     throw new BadRequestException(
-      //       `Product code ${item.productCode} does not match product ID ${item.productId}`,
-      //     );
-      //   }
-      // }
-
-      // // Create the order
-      // const order = await this.orderModel.create(
-      //   {
-      //     orderNumber: createOrderDto.orderNumber,
-      //     agentId: createOrderDto.agentId,
-      //     partnerId: createOrderDto.partnerId,
-      //     promotionId: createOrderDto.promotionId,
-      //     soNumber: createOrderDto.soNumber,
-      //     date: createOrderDto.date,
-      //     address: createOrderDto.address,
-      //     addressPostalCode: createOrderDto.addressPostalCode,
-      //     addressCity: createOrderDto.addressCity,
-      //     addressState: createOrderDto.addressState,
-      //     status: createOrderDto.status,
-      //     remark: createOrderDto.remark,
-      //     subTotal: createOrderDto.subTotal,
-      //     tax: createOrderDto.tax,
-      //     total: createOrderDto.total,
-      //     courier: createOrderDto.courier,
-      //     shippingPrice: createOrderDto.shippingPrice,
-      //     returnReason: createOrderDto.returnReason,
-      //     returnRemark: createOrderDto.returnRemark,
-      //     shippingInvoice: createOrderDto.shippingInvoice,
-      //     approveDate: createOrderDto.approveDate,
-      //     shippedDate: createOrderDto.shippedDate,
-      //     cancelledDate: createOrderDto.cancelledDate,
-      //     cancelledReason: createOrderDto.cancelledReason,
-      //     completedDate: createOrderDto.completedDate,
-      //     returnDate: createOrderDto.returnDate,
-      //     autocountStatus: createOrderDto.autocountStatus,
-      //     autocountAccountId: createOrderDto.autocountAccountId,
-      //     isDeleted: createOrderDto.isDeleted,
-      //     printDatetime: createOrderDto.printDatetime,
-      //     creditTerm: createOrderDto.creditTerm,
-      //     creditLimit: createOrderDto.creditLimit,
-      //   },
-      //   { transaction },
-      // );
-
-      // // Create order items
-      // const orderItems = createOrderDto.items.map((item) => ({
-      //   orderId: order.orderId,
-      //   productId: item.productId,
-      //   productCode: item.productCode,
-      //   productDescription: item.productDescription,
-      //   productQty: item.productQty,
-      //   productUom: item.productUom,
-      //   productUnitPrice: item.productUnitPrice,
-      //   productTotal: item.productTotal,
-      //   isDeleted: item.isDeleted,
-      //   isReturn: item.isReturn,
-      // }));
-
-      // await this.orderItemModel.bulkCreate(orderItems, {
-      //   transaction,
-      //   validate: true,
-      // });
-
-      // await transaction.commit();
-      // console.log(
-      //   `Order ${order.orderNumber} created with ${orderItems.length} items`,
-      // );
-
-      return {
-        status: 201,
-        message: "Order created successfully",
-        // data: {
-        //   ...order.toJSON(),
-        //   items: orderItems,
-        // },
-      };
-    } catch (error) {
-      // await transaction.rollback();
-      console.log("Error creating order:", error.message, error.stack);
-      // if (error.name === "SequelizeForeignKeyConstraintError") {
-      //   throw new BadRequestException("Invalid product ID reference");
-      // }
-      // if (error.name === "SequelizeValidationError") {
-      //   console.log(error.errors.map((e) => e.message));
-      //   throw new BadRequestException(error.errors.map((e) => e.message));
-      // }
-      // throw error;
+      return orders ? orders.map((o) => o.toJSON()) : [];
+    } catch (err: any) {
+      console.error("Error getting orders:", err);
+      throw new InternalServerErrorException("Failed to get orders");
     }
   }
+
+  async getOrderById(orderId: number): Promise<OrderProps | null> {
+    try {
+      const order = await this.orderModel.findByPk(orderId, {
+        include: [
+          {
+            model: OrderItem,
+            as: "orderItems",
+          },
+        ],
+      });
+      return order ? order.toJSON() : null;
+    } catch (err: any) {
+      console.error("Error getting order by ID:", err);
+      throw new InternalServerErrorException("Failed to get order by ID");
+    }
+  }
+
+  async createOrder(createOrderDto: CreateOrderDto): Promise<any | null> {
+    try {
+      // Convert date strings to Date objects
+      const orderData = {
+        ...createOrderDto,
+        date: createOrderDto.date ? new Date(createOrderDto.date) : undefined,
+        approveDate: createOrderDto.approveDate
+          ? new Date(createOrderDto.approveDate)
+          : undefined,
+        shippedDate: createOrderDto.shippedDate
+          ? new Date(createOrderDto.shippedDate)
+          : undefined,
+        cancelledDate: createOrderDto.cancelledDate
+          ? new Date(createOrderDto.cancelledDate)
+          : undefined,
+        completedDate: createOrderDto.completedDate
+          ? new Date(createOrderDto.completedDate)
+          : undefined,
+        returnDate: createOrderDto.returnDate
+          ? new Date(createOrderDto.returnDate)
+          : undefined,
+        printDatetime: createOrderDto.printDatetime
+          ? new Date(createOrderDto.printDatetime)
+          : undefined,
+      };
+
+      const order = await this.orderModel.create(orderData);
+
+      // Map items to ensure orderId is defined
+      const orderItemsData = createOrderDto.items.map((item) => ({
+        ...item,
+        orderId: order.orderId, // Ensure orderId is always set
+      }));
+
+      if (order) {
+        await this.orderItemModel.bulkCreate(orderItemsData);
+      }
+
+      const createdOrder = await this.getOrderById(order.orderId);
+      return createdOrder ? createdOrder : null;
+    } catch (err: any) {
+      console.error("Error creating order:", err);
+      throw new InternalServerErrorException("Failed to create order");
+    }
+  }
+
+  // async editOrder(
+  //   orderId: number,
+  //   updateOrderDto: UpdateOrderItemDto,
+  // ): Promise<any | null> {
+  //   try {
+  //     // Find the existing order
+  //     const order = await this.orderModel.findByPk(orderId);
+  //     if (!order) {
+  //       console.error("Order not found:", orderId);
+  //       return null;
+  //     }
+
+  //     // Convert date strings to Date objects
+  //     const orderData = {
+  //       ...updateOrderDto,
+  //       date: updateOrderDto.date ? new Date(updateOrderDto.date) : undefined,
+  //       approveDate: updateOrderDto.approveDate
+  //         ? new Date(updateOrderDto.approveDate)
+  //         : undefined,
+  //       shippedDate: updateOrderDto.shippedDate
+  //         ? new Date(updateOrderDto.shippedDate)
+  //         : undefined,
+  //       cancelledDate: updateOrderDto.cancelledDate
+  //         ? new Date(updateOrderDto.cancelledDate)
+  //         : undefined,
+  //       completedDate: updateOrderDto.completedDate
+  //         ? new Date(updateOrderDto.completedDate)
+  //         : undefined,
+  //       returnDate: updateOrderDto.returnDate
+  //         ? new Date(updateOrderDto.returnDate)
+  //         : undefined,
+  //       printDatetime: updateOrderDto.printDatetime
+  //         ? new Date(updateOrderDto.printDatetime)
+  //         : undefined,
+  //     };
+
+  //     // Update the order
+  //     await order.update(orderData);
+
+  //     // Delete existing order items
+  //     await this.orderItemModel.destroy({ where: { orderId } });
+
+  //     // Map new items to ensure orderId is defined
+  //     const orderItemsData = updateOrderDto.items.map((item) => ({
+  //       ...item,
+  //       orderId: order.orderId,
+  //     }));
+
+  //     // Create new order items
+  //     if (order) {
+  //       await this.orderItemModel.bulkCreate(orderItemsData);
+  //     }
+
+  //     return order ? order.toJSON() : null;
+  //   } catch (err: any) {
+  //     console.error("Error updating order:", err);
+  //     throw new InternalServerErrorException("Failed to update order");
+  //   }
+  // }
 }

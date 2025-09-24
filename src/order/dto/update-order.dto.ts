@@ -19,7 +19,7 @@ export enum uom {
   BOX = "box",
 }
 
-export class CreateOrderItemDto {
+export class UpdateOrderItemDto {
   @ApiProperty({
     description: "The ID of the product for this order item",
     example: 1,
@@ -374,11 +374,11 @@ export class CreateOrderDto {
 
   @ApiProperty({
     description: "Array of order items",
-    type: [CreateOrderItemDto],
+    type: [UpdateOrderItemDto],
     required: true,
   })
   @IsArray({ message: "Order items must be an array" })
   @ValidateNested({ each: true })
-  @Type(() => CreateOrderItemDto)
-  items: CreateOrderItemDto[];
+  @Type(() => UpdateOrderItemDto)
+  items: UpdateOrderItemDto[];
 }

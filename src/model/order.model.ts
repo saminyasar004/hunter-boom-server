@@ -1,11 +1,16 @@
 import {
   AutoIncrement,
+  BelongsTo,
   Column,
   DataType,
+  ForeignKey,
+  HasMany,
+  Model,
   PrimaryKey,
   Table,
-  Model,
 } from "sequelize-typescript";
+import OrderItem from "./order-item.model";
+import Promotion, { PromotionProps } from "./promotion.model";
 
 export interface OrderProps {
   orderId: number;
@@ -16,9 +21,6 @@ export interface OrderProps {
   soNumber?: string;
   date?: Date;
   address: string;
-  addressPostalCode: string;
-  addressCity: string;
-  addressState: string;
   status: string;
   remark?: string;
   subTotal?: number;
@@ -43,6 +45,8 @@ export interface OrderProps {
   creditLimit: string;
   createdAt: Date;
   updatedAt: Date;
+  promotion?: PromotionProps; // Added for BelongsTo
+  orderItems: OrderItem[]; // Added for HasMany
 }
 
 export interface OrderCreationProps {
@@ -53,9 +57,6 @@ export interface OrderCreationProps {
   soNumber?: string;
   date?: Date;
   address: string;
-  addressPostalCode: string;
-  addressCity: string;
-  addressState: string;
   status: string;
   remark?: string;
   subTotal?: number;
@@ -108,6 +109,7 @@ export default class Order extends Model<OrderProps, OrderCreationProps> {
   })
   declare partnerId?: string;
 
+  @ForeignKey(() => Promotion)
   @Column({
     type: DataType.INTEGER,
     allowNull: true,
@@ -131,24 +133,6 @@ export default class Order extends Model<OrderProps, OrderCreationProps> {
     allowNull: false,
   })
   declare address: string;
-
-  @Column({
-    type: DataType.STRING,
-    allowNull: false,
-  })
-  declare addressPostalCode: string;
-
-  @Column({
-    type: DataType.STRING,
-    allowNull: false,
-  })
-  declare addressCity: string;
-
-  @Column({
-    type: DataType.STRING,
-    allowNull: false,
-  })
-  declare addressState: string;
 
   @Column({
     type: DataType.STRING,
@@ -270,4 +254,22 @@ export default class Order extends Model<OrderProps, OrderCreationProps> {
     allowNull: true,
   })
   declare printDatetime?: Date;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+  })
+  declare creditTerm: string;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+  })
+  declare creditLimit: string;
+
+  @BelongsTo(() => Promotion, "promotionId")
+  declare promotion?: PromotionProps;
+
+  @HasMany(() => OrderItem, "orderId")
+  declare orderItems: OrderItem[];
 }

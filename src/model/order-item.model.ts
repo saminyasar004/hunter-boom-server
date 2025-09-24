@@ -6,7 +6,10 @@ import {
   PrimaryKey,
   Table,
   Model,
+  ForeignKey,
+  BelongsTo,
 } from "sequelize-typescript";
+import Order, { OrderProps } from "./order.model";
 
 export interface OrderItemProps {
   orderItemId: number;
@@ -22,6 +25,7 @@ export interface OrderItemProps {
   isReturn: number;
   createdAt: Date;
   updatedAt: Date;
+  order: OrderProps; // Added for BelongsTo
 }
 
 export interface OrderItemCreationProps {
@@ -50,17 +54,18 @@ export default class OrderItem extends Model<
   @Column({ type: DataType.INTEGER })
   declare orderItemId: number;
 
-  @Column({
-    type: DataType.INTEGER,
-    allowNull: false,
-  })
-  declare productId: number;
-
+  @ForeignKey(() => Order)
   @Column({
     type: DataType.INTEGER,
     allowNull: false,
   })
   declare orderId: number;
+
+  @Column({
+    type: DataType.INTEGER,
+    allowNull: false,
+  })
+  declare productId: number;
 
   @Column({
     type: DataType.STRING,
@@ -76,7 +81,7 @@ export default class OrderItem extends Model<
 
   @Column({
     type: DataType.DOUBLE,
-    allowNull: false,
+    allowNull: true, // Changed to true to match OrderItemCreationProps
   })
   declare productQty?: number;
 
@@ -111,4 +116,7 @@ export default class OrderItem extends Model<
     defaultValue: false,
   })
   declare isReturn: number;
+
+  @BelongsTo(() => Order, "orderId")
+  declare order: OrderProps;
 }
