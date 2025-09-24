@@ -76,6 +76,52 @@ export class AuthController {
     }
   }
 
+  @Get("users/:userId")
+  @ApiOperation({ summary: "Get a user by ID" })
+  @ApiResponse({
+    status: 200,
+    description: "User retrieved successfully",
+    schema: {
+      type: "object",
+      properties: {
+        status: { type: "number", example: 200 },
+        message: { type: "string", example: "User retrieved successfully" },
+        data: {
+          type: "object",
+          properties: {
+            id: { type: "number", example: 1 },
+            name: { type: "string", example: "John Doe" },
+            email: { type: "string", example: "admin@example.com" },
+          },
+        },
+      },
+    },
+  })
+  async getUserById(@Param("userId") userId: number) {
+    try {
+      const user = await this.authService.findUserById(userId);
+
+      if (!user) {
+        return {
+          status: 404,
+          message: "User not found",
+        };
+      }
+
+      return {
+        status: 200,
+        message: "User retrieved successfully",
+        data: user,
+      };
+    } catch (err) {
+      console.log(err);
+      return {
+        status: 500,
+        message: "Internal server error",
+      };
+    }
+  }
+
   @Post("login")
   @UsePipes(
     new ValidationPipe({
