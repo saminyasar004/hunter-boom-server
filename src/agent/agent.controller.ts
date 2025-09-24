@@ -120,6 +120,83 @@ export class AgentController {
     }
   }
 
+  @Get("/:agentId")
+  @ApiOperation({ summary: "Get an agent by ID" })
+  @ApiResponse({
+    status: 200,
+    description: "Agent retrieved successfully",
+    schema: {
+      type: "object",
+      properties: {
+        status: { type: "number", example: 200 },
+        message: { type: "string", example: "Agent retrieved successfully" },
+        data: {
+          type: "object",
+          properties: {
+            id: { type: "number", example: 1 },
+            code: { type: "string", example: "AGT001" },
+            companyName: { type: "string", example: "Acme Corp" },
+            file: {
+              type: "string",
+              example: "hunter_upload-1629876543210.jpg",
+              nullable: true,
+            },
+            contactNumber: { type: "string", example: "+1234567890" },
+            addContactNumber: { type: "string", example: "+0987654321" },
+            email: { type: "string", example: "agent@example.com" },
+            address: { type: "string", example: "123 Main St" },
+            addressPostalCode: { type: "string", example: "12345" },
+            addressCity: { type: "string", example: "New York" },
+            addressState: { type: "string", example: "NY" },
+            username: { type: "string", example: "agent123" },
+            name: { type: "string", example: "John Doe" },
+            password: { type: "string", example: "[hidden]" },
+            agentGroupId: { type: "number", example: 1 },
+            isDeleted: { type: "boolean", example: false },
+            accountBook: { type: "string", example: "ACC001" },
+            creditLimit: { type: "string", example: "1000.00" },
+            creditTerm: { type: "string", example: "30 days" },
+            status: { type: "string", example: "active" },
+            createdAt: {
+              type: "string",
+              format: "date-time",
+              example: "2025-08-22T12:30:00Z",
+            },
+            updatedAt: {
+              type: "string",
+              format: "date-time",
+              example: "2025-08-22T12:30:00Z",
+            },
+          },
+        },
+      },
+    },
+  })
+  async getAgentById(@Param("agentId") agentId: number) {
+    try {
+      const agent = await this.agentService.findAgentById(agentId);
+
+      if (!agent) {
+        return {
+          status: 404,
+          message: "Agent not found",
+        };
+      }
+
+      return {
+        status: 200,
+        message: "Agent retrieved successfully",
+        data: agent,
+      };
+    } catch (err) {
+      console.log(err);
+      return {
+        status: 500,
+        message: "Internal server error",
+      };
+    }
+  }
+
   @Post("create")
   @UsePipes(
     new ValidationPipe({
