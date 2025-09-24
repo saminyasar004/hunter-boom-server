@@ -63,10 +63,6 @@ export class PromotionService {
         const promotionProducts = await this.promotionProductModel.bulkCreate(
           createPromotionDto.promotionProducts,
         );
-
-        console.log("LOOK AT HERE...");
-
-        console.log(promotionProducts);
       }
 
       return promotion ? promotion.toJSON() : null;
