@@ -32,7 +32,7 @@ import { Sequelize } from "sequelize-typescript";
     PromotionModule,
     PromotionAgentGroupModule,
     ProductModule,
-    // OrderModule,
+    OrderModule,
   ],
   controllers: [AppController],
   providers: [AppService],
