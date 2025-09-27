@@ -10,8 +10,7 @@ import { ProductModule } from "./product/product.module";
 import { PromotionAgentGroupModule } from "./promotion-agent-group/promotion-agent-group.module";
 import { PromotionModule } from "./promotion/promotion.module";
 import { OrderModule } from "./order/order.module";
-import { Sequelize } from "sequelize-typescript";
-import { PricingModule } from './pricing/pricing.module';
+import { PricingModule } from "./pricing/pricing.module";
 
 @Module({
   imports: [
