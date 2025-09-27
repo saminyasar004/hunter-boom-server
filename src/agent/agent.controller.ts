@@ -80,6 +80,8 @@ export class AgentController {
               creditLimit: { type: "string", example: "1000.00" },
               creditTerm: { type: "string", example: "30 days" },
               status: { type: "string", example: "active" },
+              isTopLevel: { type: "number", example: 1 },
+              uplineAgentId: { type: "number", example: null },
               createdAt: {
                 type: "string",
                 format: "date-time",
@@ -157,6 +159,8 @@ export class AgentController {
             creditLimit: { type: "string", example: "1000.00" },
             creditTerm: { type: "string", example: "30 days" },
             status: { type: "string", example: "active" },
+            isTopLevel: { type: "number", example: 1 },
+            uplineAgentId: { type: "number", example: null },
             createdAt: {
               type: "string",
               format: "date-time",
@@ -300,6 +304,16 @@ export class AgentController {
           description: "The status of the agent",
           example: "active",
         },
+        isTopLevel: {
+          type: "number",
+          example: 1,
+          description: "The status of the agent",
+        },
+        uplineAgentId: {
+          type: "number",
+          example: null,
+          description: "The status of the agent",
+        },
         file: {
           type: "string",
           format: "binary",
@@ -324,6 +338,8 @@ export class AgentController {
         "creditLimit",
         "creditTerm",
         "status",
+        "isTopLevel",
+        "uplineAgentId",
       ],
     },
   })
@@ -362,6 +378,8 @@ export class AgentController {
             creditLimit: { type: "string", example: "1000.00" },
             creditTerm: { type: "string", example: "30 days" },
             status: { type: "string", example: "active" },
+            isTopLevel: { type: "number", example: 1 },
+            uplineAgentId: { type: "number", example: null },
             createdAt: {
               type: "string",
               format: "date-time",
@@ -505,6 +523,8 @@ export class AgentController {
             creditLimit: { type: "string", example: "1000.00" },
             creditTerm: { type: "string", example: "30 days" },
             status: { type: "string", example: "active" },
+            isTopLevel: { type: "number", example: 1 },
+            uplineAgentId: { type: "number", example: null },
             createdAt: {
               type: "string",
               format: "date-time",
@@ -632,6 +652,8 @@ export class AgentController {
             creditLimit: { type: "string", example: "1000.00" },
             creditTerm: { type: "string", example: "30 days" },
             status: { type: "string", example: "active" },
+            isTopLevel: { type: "number", example: 1 },
+            uplineAgentId: { type: "number", example: null },
             createdAt: {
               type: "string",
               format: "date-time",

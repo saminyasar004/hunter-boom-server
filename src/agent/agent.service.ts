@@ -51,6 +51,8 @@ export class AgentService {
         ...createAgentDto,
         password: await hashedPassword(createAgentDto.password),
         isDeleted: false,
+        isTopLevel: 1,
+        uplineAgentId: null,
         file,
       });
 

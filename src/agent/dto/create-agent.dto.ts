@@ -174,4 +174,22 @@ export class CreateAgentDto {
     message: "Status must be one of the following values: active, inactive",
   })
   status: status;
+
+  @ApiProperty({
+    description: "Determines whether the agent is a top-level agent",
+    example: 1,
+    required: true,
+  })
+  @IsNumber({}, { message: "Top-level agent must be a number" })
+  @Transform(({ value }) => parseInt(value, 10), { toClassOnly: true })
+  isTopLevel: number;
+
+  @ApiProperty({
+    description: "The ID of the agent's upline agent",
+    example: null,
+    required: true,
+  })
+  @IsNumber({}, { message: "Upline agent ID must be a number" })
+  @Transform(({ value }) => parseInt(value, 10), { toClassOnly: true })
+  uplineAgentId: number | null;
 }

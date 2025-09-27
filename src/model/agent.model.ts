@@ -30,7 +30,7 @@ export interface AgentProps {
   creditTerm: string;
   status: status;
   isTopLevel: number;
-  uplineAgentId: number;
+  uplineAgentId: number | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -56,7 +56,7 @@ export interface AgentCreationProps {
   creditTerm: string;
   status: status;
   isTopLevel: number;
-  uplineAgentId: number;
+  uplineAgentId: number | null;
 }
 
 @Table({
@@ -192,8 +192,8 @@ export default class Agent extends Model<AgentProps, AgentCreationProps> {
 
   @Column({
     type: DataType.INTEGER,
-    allowNull: false,
+    allowNull: true,
     defaultValue: 0,
   })
-  declare uplineAgentId: number;
+  declare uplineAgentId: number | null;
 }
