@@ -67,7 +67,7 @@ export class PromotionController {
                   properties: {
                     productId: { type: "number", example: 1 },
                     promotionId: { type: "number", example: 1 },
-                    agentId: { type: "number", example: 1 },
+                    agentGroupId: { type: "number", example: 1 },
                     minimumQuantity: { type: "number", example: 1 },
                     maximumQuantity: { type: "number", example: 1 },
                     operationType: {

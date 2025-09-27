@@ -53,7 +53,7 @@ export class CreatePromotionDto {
     example: [
       {
         productId: 1,
-        agentId: 1,
+        agentGroupId: 1,
         minimumQuantity: 1,
         maximumQuantity: 1,
         operationType: "fixed",

@@ -13,7 +13,7 @@ import Promotion, { PromotionProps } from "./promotion.model";
 export interface PromotionProductProps {
   productId: number;
   promotionId: number;
-  agentId: number;
+  agentGroupId: number;
   minimumQuantity: number;
   maximumQuantity: number;
   operationType: "fixed" | "percentage";
@@ -25,7 +25,7 @@ export interface PromotionProductProps {
 export interface PromotionProductCreationProps {
   productId: number;
   promotionId: number;
-  agentId: number;
+  agentGroupId: number;
   minimumQuantity: number;
   maximumQuantity: number;
   operationType: "fixed" | "percentage";
@@ -56,7 +56,7 @@ export default class PromotionProduct extends Model<
     type: DataType.INTEGER,
     allowNull: false,
   })
-  declare agentId: number;
+  declare agentGroupId: number;
 
   @Column({
     type: DataType.INTEGER,

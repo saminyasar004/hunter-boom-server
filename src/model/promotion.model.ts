@@ -8,9 +8,7 @@ import {
   Table,
 } from "sequelize-typescript";
 import { status } from "../interfaces";
-import PromotionProduct, {
-  PromotionProductProps,
-} from "./promotion-product.model";
+import PromotionProduct from "./promotion-product.model";
 
 export interface PromotionProps {
   promotionId: number;
