@@ -69,12 +69,19 @@ export class AgentService {
   async editAgent(
     agentId: number,
     updateAgentDto: UpdateAgentDto,
+    file?: string,
   ): Promise<Agent | AgentCreationProps | null> {
     try {
+      const agent = await this.agentModel.findOne({
+        where: {
+          agentId,
+        },
+      });
+
       const updatedAgent = await this.agentModel.update(
         {
           ...updateAgentDto,
-          password: await hashedPassword(updateAgentDto.password),
+          file,
         },
         {
           where: {
@@ -82,6 +89,10 @@ export class AgentService {
           },
         },
       );
+
+      if (agent && updateAgentDto.password) {
+        agent.password = await hashedPassword(updateAgentDto.password);
+      }
 
       if (updatedAgent) {
         return this.findAgentById(agentId);

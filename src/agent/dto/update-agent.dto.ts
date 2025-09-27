@@ -2,13 +2,14 @@ import { status } from "@/interfaces";
 import { ApiProperty } from "@nestjs/swagger";
 import { Transform } from "class-transformer";
 import {
-  IsBoolean,
   IsEmail,
   IsEnum,
   IsNumber,
+  IsOptional,
   IsString,
   Matches,
   MinLength,
+  ValidateIf,
 } from "class-validator";
 
 /**
@@ -21,17 +22,11 @@ export class UpdateAgentDto {
     required: true,
   })
   @IsString({ message: "Code must be a string" })
-  @MinLength(3, { message: "Code must be at least 3 characters long" })
   code: string;
 
-  @ApiProperty({
-    description: "The company name of the agent",
-    example: "Acme Corp",
-    required: true,
-  })
-  @IsString({ message: "Company name must be a string" })
-  @MinLength(2, { message: "Company name must be at least 2 characters long" })
-  companyName: string;
+  @ApiProperty({ description: "The name of the agent", example: "Agent Name" })
+  @IsString({ message: "Name must be a string" })
+  agentName: string;
 
   @ApiProperty({
     description: "The primary contact number of the agent",
@@ -50,20 +45,11 @@ export class UpdateAgentDto {
   addContactNumber: string;
 
   @ApiProperty({
-    description: "The email address of the agent",
-    example: "agent@example.com",
-    required: true,
-  })
-  @IsEmail({}, { message: "Email must be a valid email address" })
-  email: string;
-
-  @ApiProperty({
     description: "The street address of the agent",
     example: "123 Main St",
     required: true,
   })
   @IsString({ message: "Address must be a string" })
-  @MinLength(5, { message: "Address must be at least 5 characters long" })
   address: string;
 
   @ApiProperty({
@@ -72,7 +58,6 @@ export class UpdateAgentDto {
     required: true,
   })
   @IsString({ message: "Postal code must be a string" })
-  @MinLength(3, { message: "Postal code must be at least 3 characters long" })
   addressPostalCode: string;
 
   @ApiProperty({
@@ -81,7 +66,6 @@ export class UpdateAgentDto {
     required: true,
   })
   @IsString({ message: "City must be a string" })
-  @MinLength(2, { message: "City must be at least 2 characters long" })
   addressCity: string;
 
   @ApiProperty({
@@ -90,7 +74,6 @@ export class UpdateAgentDto {
     required: true,
   })
   @IsString({ message: "State must be a string" })
-  @MinLength(2, { message: "State must be at least 2 characters long" })
   addressState: string;
 
   @ApiProperty({
@@ -99,31 +82,25 @@ export class UpdateAgentDto {
     required: true,
   })
   @IsString({ message: "Username must be a string" })
-  @MinLength(4, { message: "Username must be at least 4 characters long" })
   username: string;
 
   @ApiProperty({
-    description: "The name for the agent's account",
-    example: "agent123",
-    required: true,
-  })
-  @IsString({ message: "Name must be a string" })
-  @MinLength(4, { message: "Name must be at least 4 characters long" })
-  name: string;
-
-  @ApiProperty({
     description:
-      "The agent's password, must contain at least one uppercase letter, one lowercase letter, and one number",
+      "The agent's password, must contain at least one uppercase letter, one lowercase letter, and one number when provided",
     example: "admin@12345",
-    required: true,
+    required: false,
   })
+  @IsOptional()
+  @ValidateIf(
+    (o) => o.password !== "" && o.password !== null && o.password !== undefined,
+  )
   @IsString({ message: "Password must be a string" })
-  @MinLength(6, { message: "Password must be at least 6 characters long" })
-  @Matches(/^(?=.*[a-z])(?=.*\d)[A-Za-z\d@$!%*?&]{6,}$/, {
+  @Matches(/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, {
     message:
       "Password must contain at least one uppercase letter, one lowercase letter, and one number",
   })
-  password: string;
+  @MinLength(8, { message: "Password must be at least 8 characters long" })
+  password?: string;
 
   @ApiProperty({
     description: "The ID of the agent group to associate with the agent",
@@ -174,22 +151,4 @@ export class UpdateAgentDto {
     message: "Status must be one of the following values: active, inactive",
   })
   status: status;
-
-  @ApiProperty({
-    description: "Determines whether the agent is a top-level agent",
-    example: 1,
-    required: true,
-  })
-  @IsNumber({}, { message: "Top-level agent must be a number" })
-  @Transform(({ value }) => parseInt(value, 10), { toClassOnly: true })
-  isTopLevel: number;
-
-  @ApiProperty({
-    description: "The ID of the agent's upline agent",
-    example: null,
-    required: true,
-  })
-  @IsNumber({}, { message: "Upline agent ID must be a number" })
-  @Transform(({ value }) => parseInt(value, 10), { toClassOnly: true })
-  uplineAgentId: number | null;
 }

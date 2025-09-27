@@ -11,17 +11,15 @@ import {
 export interface AgentProps {
   agentId: number;
   code: string;
-  companyName: string;
+  agentName: string;
   file?: string;
   contactNumber: string;
   addContactNumber: string;
-  email: string;
   address: string;
   addressPostalCode: string;
   addressCity: string;
   addressState: string;
   username: string;
-  name: string;
   password: string;
   agentGroupId: number;
   isDeleted: boolean;
@@ -37,17 +35,15 @@ export interface AgentProps {
 
 export interface AgentCreationProps {
   code: string;
-  companyName: string;
+  agentName: string;
   file?: string;
   contactNumber: string;
   addContactNumber: string;
-  email: string;
   address: string;
   addressPostalCode: string;
   addressCity: string;
   addressState: string;
   username: string;
-  name: string;
   password: string;
   agentGroupId: number;
   isDeleted: boolean;
@@ -75,11 +71,8 @@ export default class Agent extends Model<AgentProps, AgentCreationProps> {
   })
   declare code: string;
 
-  @Column({
-    type: DataType.STRING,
-    allowNull: false,
-  })
-  declare companyName: string;
+  @Column({ type: DataType.STRING, allowNull: false })
+  declare agentName: string;
 
   @Column({
     type: DataType.TEXT,
@@ -98,12 +91,6 @@ export default class Agent extends Model<AgentProps, AgentCreationProps> {
     allowNull: false,
   })
   declare addContactNumber: string;
-
-  @Column({
-    type: DataType.STRING,
-    allowNull: false,
-  })
-  declare email: string;
 
   @Column({
     type: DataType.STRING,
@@ -134,12 +121,6 @@ export default class Agent extends Model<AgentProps, AgentCreationProps> {
     allowNull: false,
   })
   declare username: string;
-
-  @Column({
-    type: DataType.STRING,
-    allowNull: false,
-  })
-  declare name: string;
 
   @Column({
     type: DataType.STRING,
