@@ -34,6 +34,7 @@ import { PricingModule } from './pricing/pricing.module';
     PromotionAgentGroupModule,
     ProductModule,
     OrderModule,
+    PricingModule,
   ],
   controllers: [AppController],
   providers: [AppService],
