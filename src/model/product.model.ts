@@ -6,6 +6,8 @@ import {
   Table,
   Model,
 } from "sequelize-typescript";
+import ProductAgentPricing from "./product-agent-pricing.model";
+import AgentGroup from "./agent-group.model";
 
 export interface ProductProps {
   productId: number;
@@ -114,4 +116,12 @@ export default class Product extends Model<ProductProps, ProductCreationProps> {
     defaultValue: false,
   })
   declare isDeleted: number;
+
+  static associate() {
+    Product.hasMany(ProductAgentPricing, { foreignKey: "productId" });
+    Product.belongsToMany(AgentGroup, {
+      through: ProductAgentPricing,
+      foreignKey: "productId",
+    });
+  }
 }

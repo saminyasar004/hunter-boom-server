@@ -1,6 +1,8 @@
 import { Sequelize } from "sequelize-typescript";
 import path from "path";
 import { dbConnectionString } from "./dotenv.config";
+import Product from "@/model/product.model";
+import AgentGroup from "@/model/agent-group.model";
 
 export const sequelize = new Sequelize(dbConnectionString, {
   dialect: "mysql",
@@ -17,6 +19,8 @@ export const sequelize = new Sequelize(dbConnectionString, {
 export const initializeDatabase = async () => {
   try {
     await sequelize.authenticate();
+    Product.associate();
+    AgentGroup.associate();
     // Sync models after database creation
     await sequelize.sync({ alter: true });
     console.log("Database synced successfully!".green);
