@@ -11,6 +11,7 @@ import { PromotionAgentGroupModule } from "./promotion-agent-group/promotion-age
 import { PromotionModule } from "./promotion/promotion.module";
 import { OrderModule } from "./order/order.module";
 import { Sequelize } from "sequelize-typescript";
+import { PricingModule } from './pricing/pricing.module';
 
 @Module({
   imports: [
