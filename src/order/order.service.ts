@@ -3,6 +3,7 @@ import Order, { OrderProps } from "@/model/order.model";
 import { Injectable, InternalServerErrorException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/sequelize";
 import { CreateOrderDto } from "./dto/create-order.dto";
+import { UpdateOrderDto } from "./dto/update-order.dto";
 
 @Injectable()
 export class OrderService {
@@ -93,63 +94,63 @@ export class OrderService {
     }
   }
 
-  // async editOrder(
-  //   orderId: number,
-  //   updateOrderDto: UpdateOrderItemDto,
-  // ): Promise<any | null> {
-  //   try {
-  //     // Find the existing order
-  //     const order = await this.orderModel.findByPk(orderId);
-  //     if (!order) {
-  //       console.error("Order not found:", orderId);
-  //       return null;
-  //     }
+  async editOrder(
+    orderId: number,
+    updateOrderDto: UpdateOrderDto,
+  ): Promise<any | null> {
+    try {
+      // Find the existing order
+      const order = await this.orderModel.findByPk(orderId);
+      if (!order) {
+        console.error("Order not found:", orderId);
+        return null;
+      }
 
-  //     // Convert date strings to Date objects
-  //     const orderData = {
-  //       ...updateOrderDto,
-  //       date: updateOrderDto.date ? new Date(updateOrderDto.date) : undefined,
-  //       approveDate: updateOrderDto.approveDate
-  //         ? new Date(updateOrderDto.approveDate)
-  //         : undefined,
-  //       shippedDate: updateOrderDto.shippedDate
-  //         ? new Date(updateOrderDto.shippedDate)
-  //         : undefined,
-  //       cancelledDate: updateOrderDto.cancelledDate
-  //         ? new Date(updateOrderDto.cancelledDate)
-  //         : undefined,
-  //       completedDate: updateOrderDto.completedDate
-  //         ? new Date(updateOrderDto.completedDate)
-  //         : undefined,
-  //       returnDate: updateOrderDto.returnDate
-  //         ? new Date(updateOrderDto.returnDate)
-  //         : undefined,
-  //       printDatetime: updateOrderDto.printDatetime
-  //         ? new Date(updateOrderDto.printDatetime)
-  //         : undefined,
-  //     };
+      // Convert date strings to Date objects
+      const orderData = {
+        ...updateOrderDto,
+        date: updateOrderDto.date ? new Date(updateOrderDto.date) : undefined,
+        approveDate: updateOrderDto.approveDate
+          ? new Date(updateOrderDto.approveDate)
+          : undefined,
+        shippedDate: updateOrderDto.shippedDate
+          ? new Date(updateOrderDto.shippedDate)
+          : undefined,
+        cancelledDate: updateOrderDto.cancelledDate
+          ? new Date(updateOrderDto.cancelledDate)
+          : undefined,
+        completedDate: updateOrderDto.completedDate
+          ? new Date(updateOrderDto.completedDate)
+          : undefined,
+        returnDate: updateOrderDto.returnDate
+          ? new Date(updateOrderDto.returnDate)
+          : undefined,
+        printDatetime: updateOrderDto.printDatetime
+          ? new Date(updateOrderDto.printDatetime)
+          : undefined,
+      };
 
-  //     // Update the order
-  //     await order.update(orderData);
+      // Update the order
+      await order.update(orderData);
 
-  //     // Delete existing order items
-  //     await this.orderItemModel.destroy({ where: { orderId } });
+      // Delete existing order items
+      await this.orderItemModel.destroy({ where: { orderId } });
 
-  //     // Map new items to ensure orderId is defined
-  //     const orderItemsData = updateOrderDto.items.map((item) => ({
-  //       ...item,
-  //       orderId: order.orderId,
-  //     }));
+      // Map new items to ensure orderId is defined
+      const orderItemsData = updateOrderDto.items.map((item) => ({
+        ...item,
+        orderId: order.orderId,
+      }));
 
-  //     // Create new order items
-  //     if (order) {
-  //       await this.orderItemModel.bulkCreate(orderItemsData);
-  //     }
+      // Create new order items
+      if (order) {
+        await this.orderItemModel.bulkCreate(orderItemsData);
+      }
 
-  //     return order ? order.toJSON() : null;
-  //   } catch (err: any) {
-  //     console.error("Error updating order:", err);
-  //     throw new InternalServerErrorException("Failed to update order");
-  //   }
-  // }
+      return order ? order.toJSON() : null;
+    } catch (err: any) {
+      console.error("Error updating order:", err);
+      throw new InternalServerErrorException("Failed to update order");
+    }
+  }
 }

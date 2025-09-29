@@ -108,7 +108,7 @@ export class UpdateOrderItemDto {
   orderId?: number; // Added to allow assignment in OrderService
 }
 
-export class CreateOrderDto {
+export class UpdateOrderDto {
   @ApiProperty({
     description: "Unique order number",
     example: "ORD001",
