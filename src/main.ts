@@ -16,9 +16,25 @@ async function bootstrap() {
     logger,
   });
 
+  // Trust proxy (ngrok acts as one)
+  app.enable("trust proxy", true); // Or app.set('trust proxy', true) if using Express directly
+
+  // Force HTTPS scheme for requests from ngrok (prevents HTTP redirects)
+  app.use((req, res, next) => {
+    if (req.get("host")?.includes("ngrok")) {
+      // Or check req.hostname
+      req = req as any; // TypeScript workaround if needed
+      req.secure = true; // Treat as secure
+      (req as any).protocol = "https"; // Force protocol
+    }
+    next();
+  });
+
   // Enable CORS for all origins
   app.enableCors({
-    origin: "*", // Allow all origins (for development/LAN)
+    // originorigin: ["https://localhost:5173/", "https://*.ngrok-free.app"],: "*", // Allow all origins (for development/LAN)
+    // origin: ["https://localhost:5173/", "https://*.ngrok-free.app"],
+    origin: "*",
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS", // Allowed methods
     credentials: true, // Allow cookies/auth headers (if needed)
   });
