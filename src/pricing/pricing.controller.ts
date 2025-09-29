@@ -33,7 +33,7 @@ class CreatePricingResponseDto {
 }
 
 @ApiTags("Pricing")
-@Controller("pricing")
+@Controller("api/pricing")
 export class PricingController {
   constructor(private readonly pricingService: PricingService) {}
 
